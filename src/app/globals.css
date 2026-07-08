@@ -1,14 +1,90 @@
 @import "@fontsource/lxgw-wenkai/index.css";
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
   --color-paper: #faf8f4;
   --color-ink: #2c2a26;
   --color-ink-muted: #6b6560;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
 }
 
 @theme inline {
   --font-wenkai: "LXGW WenKai", serif;
+  --font-heading: var(--font-sans);
+  --font-sans: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
 html,
@@ -25,6 +101,49 @@ body {
 }
 
 /* 阅读页中文排版：字面功夫用 CSS，骨架交给 Tailwind */
+
+/* 切换控件：角落安放，低对比，不抢正文 */
+.poem-reader__toolbar {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 10;
+  opacity: 0.72;
+  transition: opacity 160ms ease;
+}
+
+.poem-reader__toolbar:hover,
+.poem-reader__toolbar:focus-within {
+  opacity: 1;
+}
+
+.poem-reader__toolbar [data-slot="toggle-group"] {
+  background: color-mix(in srgb, var(--color-paper) 88%, var(--color-ink));
+  border-color: color-mix(in srgb, var(--color-ink) 12%, transparent);
+}
+
+.poem-reader__toolbar [data-slot="toggle-group-item"] {
+  min-width: 2rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  color: var(--color-ink-muted);
+}
+
+.poem-reader__toolbar [data-slot="toggle-group-item"][data-pressed],
+.poem-reader__toolbar [data-slot="toggle-group-item"][data-state="on"] {
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+
+.poem-reader__sheet {
+  max-width: 28rem;
+}
+
+.poem-reader__header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
 .poem-reader__title {
   font-size: 1.75rem;
   font-weight: 400;
@@ -39,10 +158,16 @@ body {
   letter-spacing: 0.08em;
 }
 
+.poem-reader__body {
+  text-align: center;
+}
+
 .poem-reader__line {
   font-size: 1.25rem;
   line-height: 2.2;
   letter-spacing: 0.06em;
+  /* 标点悬挂：行首标点略探出，减轻「挤在列里」的观感 */
+  hanging-punctuation: allow-end first;
 }
 
 @media (min-width: 768px) {
@@ -53,6 +178,66 @@ body {
   .poem-reader__line {
     font-size: 1.375rem;
     line-height: 2.4;
+  }
+}
+
+/* 竖排：列自右向左，字自上而下；标题留在首列上方 */
+.poem-reader--vertical {
+  align-items: flex-end;
+  justify-content: center;
+  padding-inline: clamp(2rem, 8vw, 4rem);
+}
+
+.poem-reader--vertical .poem-reader__sheet {
+  max-width: none;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  hanging-punctuation: allow-end first;
+}
+
+.poem-reader--vertical .poem-reader__header {
+  margin-bottom: 0;
+  margin-inline-start: 2.5em;
+  text-align: start;
+}
+
+.poem-reader--vertical .poem-reader__title {
+  font-size: 1.625rem;
+  letter-spacing: 0.1em;
+  line-height: 1.75;
+}
+
+.poem-reader--vertical .poem-reader__meta {
+  margin-top: 1.25em;
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+}
+
+.poem-reader--vertical .poem-reader__body {
+  text-align: start;
+}
+
+.poem-reader--vertical .poem-reader__line {
+  display: inline-block;
+  margin-inline-start: 1.75em;
+  font-size: 1.125rem;
+  /* 竖排列距略紧于横排行距，一列内字形连贯 */
+  line-height: 1.85;
+  letter-spacing: 0.05em;
+}
+
+.poem-reader--vertical .poem-reader__line:first-child {
+  margin-inline-start: 0;
+}
+
+@media (min-width: 768px) {
+  .poem-reader--vertical .poem-reader__title {
+    font-size: 1.875rem;
+  }
+
+  .poem-reader--vertical .poem-reader__line {
+    font-size: 1.25rem;
+    margin-inline-start: 2em;
   }
 }
 
@@ -129,4 +314,49 @@ body {
   font-size: 0.95rem;
   color: var(--color-ink-muted);
   letter-spacing: 0.06em;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-wenkai), serif;
+  }
 }
