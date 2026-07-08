@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
+import { FONT_UI_LITERALS } from "@/lib/font-ui-literals";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
-const SOURCE_ROOT = path.join(process.cwd(), "src");
 
 /** UI 与排版常用标点，竖排悬挂与检索面板也需要。 */
 export const FONT_GLYPH_FALLBACK =
@@ -49,10 +49,7 @@ function walkFiles(root: string, extensions: string[]): string[] {
         continue;
       }
 
-      if (
-        extensions.some((ext) => entry.name.endsWith(ext)) &&
-        !entry.name.includes(".test.")
-      ) {
+      if (extensions.some((ext) => entry.name.endsWith(ext))) {
         files.push(fullPath);
       }
     }
@@ -63,20 +60,17 @@ function walkFiles(root: string, extensions: string[]): string[] {
 
 export function collectSiteFontGlyphs(options?: {
   contentRoot?: string;
-  sourceRoot?: string;
+  uiLiterals?: string;
 }): number[] {
   const contentRoot = options?.contentRoot ?? CONTENT_ROOT;
-  const sourceRoot = options?.sourceRoot ?? SOURCE_ROOT;
+  const uiLiterals = options?.uiLiterals ?? FONT_UI_LITERALS;
 
   const codePoints: number[] = [
     ...extractCodePoints(FONT_GLYPH_FALLBACK),
+    ...extractCodePoints(uiLiterals),
   ];
 
   for (const file of walkFiles(contentRoot, [".md", ".json"])) {
-    codePoints.push(...extractCodePoints(fs.readFileSync(file, "utf8")));
-  }
-
-  for (const file of walkFiles(sourceRoot, [".ts", ".tsx"])) {
     codePoints.push(...extractCodePoints(fs.readFileSync(file, "utf8")));
   }
 

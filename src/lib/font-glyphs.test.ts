@@ -49,16 +49,16 @@ describe("collectSiteFontGlyphs", () => {
     expect(glyphs).toContain("K".codePointAt(0));
   });
 
-  it("collects characters from content and source trees", () => {
+  it("collects characters from content and ui literals", () => {
     const contentRoot = makeTempContent({
       "poems/test.md": "关关雎鸠",
       "characters/x.json": '{"char":"雎","meaning":"鸟名"}',
     });
-    const sourceRoot = makeTempContent({
-      "components/Example.tsx": "检索面板",
-    });
 
-    const glyphs = collectSiteFontGlyphs({ contentRoot, sourceRoot });
+    const glyphs = collectSiteFontGlyphs({
+      contentRoot,
+      uiLiterals: "检索面板",
+    });
     for (const char of "关关雎鸠雎鸟名检索面板") {
       expect(glyphs).toContain(char.codePointAt(0));
     }
