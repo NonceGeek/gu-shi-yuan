@@ -93,14 +93,16 @@ volume: wei
 ### Git 连接（推荐）
 
 1. 将仓库推送到 GitHub
-2. 在 Cloudflare Dashboard → Workers & Pages → Create → Connect to Git
+2. 在 Cloudflare Dashboard → Workers & Pages → Connect to Git
 3. 构建设置：
    - **Build command**: `npm run build`
-   - **Build output directory**: `out`
-   - **Deploy command**: **留空**（不要填 `npx wrangler deploy`）
+   - **Build output directory**: `out`（Workers 项目可留空，由 `wrangler.toml` 指定）
+   - **Deploy command**（Workers 项目）: `npx wrangler deploy`（默认即可）
    - **Node.js version**: 20 或更高
 
-   Git 连接的 Pages 会在构建完成后自动发布 `out/` 目录，无需额外 deploy 命令。若误填 `wrangler deploy`，会把它当成 Worker 项目而失败。
+   本项目 `wrangler.toml` 已配置 `[assets] directory = "./out"`，`wrangler deploy` 会直接发布静态站。
+
+   若创建的是经典 **Pages** 项目（无 Deploy command 字段），则 Build output directory 填 `out`，Deploy command 留空。
 
 4. 推送即自动部署
 
@@ -108,7 +110,7 @@ volume: wei
 
 ```bash
 npm run build
-npx wrangler pages deploy out --project-name=gushiyuan
+npx wrangler deploy
 ```
 
 ## 技术栈

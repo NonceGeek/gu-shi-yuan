@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://gsy.aiwayfarer.net"),
   title: "古诗源",
   description: "回到原点的古诗阅读",
 };
