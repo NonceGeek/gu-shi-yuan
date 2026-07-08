@@ -5,10 +5,6 @@ authorSlug: gu-shi-shi-jiu-shou
 dynasty: 漢
 volume: han
 base: 《古詩源·卷四》沈德潛 中華書局點校本
-variants:
-  - line: 2
-    at: 萬餘里
-    note: 一作「万余里」；逯欽立《先秦漢魏晉南北朝詩》同底本作「萬餘里」。
 ---
 
 行行重行行，與君生別離。

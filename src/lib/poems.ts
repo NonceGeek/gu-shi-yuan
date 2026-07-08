@@ -21,16 +21,9 @@ export type AuthorMeta = {
   name: string;
 };
 
-export type PoemVariant = {
-  line: number;
-  at?: string;
-  note: string;
-};
-
 export type Poem = PoemMeta & {
   body: string;
   base?: string;
-  variants: PoemVariant[];
 };
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
@@ -61,38 +54,6 @@ function parseBase(data: Record<string, unknown>): string | undefined {
   return base || undefined;
 }
 
-function parseVariants(data: Record<string, unknown>): PoemVariant[] {
-  const value = data.variants;
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return value.flatMap((item) => {
-    if (!item || typeof item !== "object") {
-      return [];
-    }
-
-    const record = item as Record<string, unknown>;
-    const line = record.line;
-    const note = record.note;
-
-    if (typeof line !== "number" || line < 1 || !Number.isInteger(line)) {
-      return [];
-    }
-
-    if (typeof note !== "string" || note.trim() === "") {
-      return [];
-    }
-
-    const at =
-      typeof record.at === "string" && record.at.trim()
-        ? record.at.trim()
-        : undefined;
-
-    return [{ line, ...(at ? { at } : {}), note: note.trim() }];
-  });
-}
-
 function parsePoemFile(slug: string): Poem {
   const filePath = path.join(POEMS_DIR, `${slug}.md`);
   const raw = fs.readFileSync(filePath, "utf-8");
@@ -107,7 +68,6 @@ function parsePoemFile(slug: string): Poem {
     volume: requireField(data, "volume", slug),
     body: content.trim(),
     base: parseBase(data),
-    variants: parseVariants(data),
   };
 }
 

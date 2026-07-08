@@ -10,18 +10,20 @@ export type BreadcrumbItem = {
 
 type BreadcrumbsProps = {
   items: BreadcrumbItem[];
+  /** 竖排阅读时顶栏面包屑仍横排展示 */
+  layout?: "auto" | "horizontal";
 };
 
-export function Breadcrumbs({ items }: BreadcrumbsProps) {
+export function Breadcrumbs({ items, layout = "auto" }: BreadcrumbsProps) {
   const direction = useReadingDirection();
 
   if (items.length === 0) {
     return null;
   }
 
-  // 竖排：用全角空格留白分隔，避免 › 旋转后方向语义误导。
-  // 横排：保留 › 作分隔符。
-  const separator = direction === "vertical" ? "\u3000" : "›";
+  const useVerticalSeparator =
+    layout === "auto" && direction === "vertical";
+  const separator = useVerticalSeparator ? "\u3000" : "›";
 
   return (
     <nav aria-label="面包屑" className="breadcrumbs">

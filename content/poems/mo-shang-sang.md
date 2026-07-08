@@ -5,10 +5,6 @@ authorSlug: han-yue-fu
 dynasty: 漢
 volume: han
 base: 《古詩源·卷三》沈德潛 中華書局點校本（摘錄）
-variants:
-  - line: 3
-    at: 自名為
-    note: 一作「自言名」；逯欽立《先秦漢魏晉南北朝詩》同底本作「自名為」。
 ---
 
 日出東南隅，照我秦氏樓。

@@ -5,10 +5,6 @@ authorSlug: cao-cao
 dynasty: 魏
 volume: wei
 base: 《古詩源·卷五》沈德潛 中華書局點校本
-variants:
-  - line: 5
-    at: 嗣還自相戕
-    note: 一作「骨肉自相殘」；逯欽立《先秦漢魏晉南北朝詩》同底本作「嗣還自相戕」。
 ---
 
 關東有義士，興兵討群凶。

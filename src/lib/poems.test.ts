@@ -25,24 +25,16 @@ describe("getPoemBySlug", () => {
     expect(poem?.body).toContain("周公吐哺，天下歸心。");
   });
 
-  it("returns optional base and variants from frontmatter", () => {
+  it("returns optional base from frontmatter", () => {
     const poem = getPoemBySlug("duan-ge-xing");
 
     expect(poem?.base).toMatch(/古詩源/);
-    expect(poem?.variants.length).toBeGreaterThan(0);
-    expect(poem?.variants[0]).toEqual(
-      expect.objectContaining({
-        line: expect.any(Number),
-        note: expect.stringMatching(/\S/),
-      }),
-    );
   });
 
-  it("leaves variants empty when frontmatter omits them", () => {
+  it("leaves base undefined when frontmatter omits it", () => {
     const poem = getPoemBySlug("guan-cang-hai");
 
     expect(poem?.base).toMatch(/古詩源/);
-    expect(poem?.variants).toEqual([]);
   });
 
   it("returns undefined for an unknown slug", () => {

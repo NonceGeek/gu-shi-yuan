@@ -5,16 +5,6 @@ authorSlug: cao-cao
 dynasty: 魏
 volume: wei
 base: 《古詩源·卷五》沈德潛 中華書局點校本
-variants:
-  - line: 4
-    at: 幽思
-    note: 一作「憂思」，《文選》及通行本多從此。
-  - line: 5
-    at: 惟有
-    note: 一作「唯有」；逯欽立《先秦漢魏晉南北朝詩》同底本作「惟有」。
-  - line: 13
-    at: 谈讌
-    note: 一作「談宴」；逯欽立作「談讌」，《文選》作「談宴」。
 ---
 
 對酒當歌，人生幾何！

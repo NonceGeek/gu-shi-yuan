@@ -163,44 +163,6 @@ body {
   text-align: center;
 }
 
-.poem-reader__collation {
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
-  text-align: left;
-  font-size: 0.8125rem;
-  line-height: 1.7;
-  color: color-mix(in srgb, var(--color-ink) 56%, transparent);
-  letter-spacing: 0.04em;
-}
-
-.poem-reader__variants {
-  margin: 0.75rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.poem-reader__variant {
-  display: flex;
-  gap: 0.45rem;
-  align-items: baseline;
-}
-
-.poem-reader__variant + .poem-reader__variant {
-  margin-top: 0.45rem;
-}
-
-.poem-reader__variant-mark {
-  flex: none;
-  font-size: 0.6875rem;
-  color: color-mix(in srgb, var(--color-ink) 40%, transparent);
-}
-
-.poem-reader__variant-at {
-  flex: none;
-  color: color-mix(in srgb, var(--color-ink) 68%, transparent);
-}
-
 .poem-reader__line {
   font-size: clamp(1.125rem, 3.4vw, 1.375rem);
   line-height: 2.2;
@@ -419,11 +381,11 @@ body {
   }
 }
 
-/* 竖排：列自右向左，字自上而下；标题留在首列上方 */
+/* 竖排：顶栏横排面包屑，中段仅诗题与正文成列，底栏横排导航 */
 .poem-reader--vertical {
   align-items: stretch;
   justify-content: flex-start;
-  padding-bottom: clamp(1.25rem, 4vh, 2rem);
+  padding-bottom: clamp(1rem, 3vh, 1.75rem);
 }
 
 .poem-reader--vertical .poem-reader__viewport {
@@ -433,184 +395,150 @@ body {
   flex-direction: column;
 }
 
+.poem-reader__vertical-layout {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2.5vh, 1.5rem);
+}
+
+/* 顶栏：面包屑保持横排，不挤占正文列宽 */
+.poem-reader__vertical-head {
+  flex-shrink: 0;
+  writing-mode: horizontal-tb;
+}
+
+.poem-reader__vertical-head .breadcrumbs {
+  margin: 0;
+}
+
+.poem-reader__vertical-head .breadcrumbs__list {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 0.375rem;
+  font-size: 0.8125rem;
+}
+
+.poem-reader__vertical-head .breadcrumbs__item {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.375rem;
+}
+
 /*
- * 横向滚动容器：靠起始排列 + 仅在未溢出时视觉居中。
- * `justify-content: safe center` 在内容溢出时退化为 flex-start，
- * 保证首列（最右端）始终可达，不会被居中推出视口外。
- * 不再用 `overflow-y: hidden` 裁竖向——单列高度自适应，长句可滚动。
+ * 横向滚动容器：仅在诗题与正文列溢出时滚动。
+ * `justify-content: safe center` 未溢出时居中，溢出时退化为起始对齐。
  */
 .poem-reader--vertical .poem-reader__columns-viewport {
   flex: 1;
   min-height: 0;
   display: flex;
+  align-items: center;
   justify-content: safe center;
   overflow-x: auto;
-  overflow-y: auto;
+  overflow-y: hidden;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
-  /* 原生锚定首列：scroll-snap 优先停在列端，JS 兜底处理跨浏览器原点差异。 */
   scroll-snap-type: x proximity;
-  scroll-padding: clamp(1rem, 3vh, 2rem) clamp(1rem, 4vw, 2rem);
+  scroll-padding-inline: clamp(1rem, 4vw, 2rem);
 }
 
 /*
- * 列容器：flex 行，列自右向左排列（row-reverse 让首项落在最右端=首列），
- * 显式 gap 做列距，各列顶端对齐。
- * 列序（右→左）：面包屑 → 诗题 → 卷名·作者 → 正文（四句一列）
- * → 异文校勘 → 上/下一首。
+ * 列容器：row-reverse 让 masthead 落最右端=起读列；
+ * 正文四句一列，自右向左。
  */
 .poem-reader--vertical .poem-reader__columns {
   display: flex;
   flex-direction: row-reverse;
   align-items: flex-start;
-  gap: clamp(1.5em, 4.5vw, 2em);
-  padding: clamp(1rem, 3vh, 2rem) clamp(1rem, 4vw, 2rem);
-  min-height: min(68dvh, 100%);
+  gap: clamp(2em, 5vw, 2.75em);
+  padding-block: clamp(0.75rem, 3vh, 1.5rem);
+  padding-inline: clamp(1rem, 4vw, 2rem);
+  min-height: min(52dvh, 100%);
+  margin-block: auto;
 }
 
-/* 所有列共享：竖排、字直立、顶端对齐 */
-.poem-reader--vertical .breadcrumbs,
-.poem-reader--vertical .poem-reader__title-column,
-.poem-reader--vertical .poem-reader__meta-column,
-.poem-reader--vertical .poem-reader__body-column,
-.poem-reader--vertical .poem-reader__collation,
-.poem-reader--vertical .poem-nav {
+/* 诗题与作者：竖排 block 流，题在右、作者在左 */
+.poem-reader--vertical .poem-reader__masthead,
+.poem-reader--vertical .poem-reader__body-column {
   writing-mode: vertical-rl;
   text-orientation: upright;
   hanging-punctuation: allow-end first last;
   scroll-snap-align: end;
 }
 
-/* 面包屑列：自上而下竖排，全角空格留白分隔 */
-.poem-reader--vertical .breadcrumbs {
+.poem-reader--vertical .poem-reader__masthead {
+  flex-shrink: 0;
+  padding-block-end: 0.5em;
+  /* vertical-rl 下 block-end = 屏幕左侧，作题头与正文间的纵线 */
+  border-block-end: 1px solid color-mix(in srgb, var(--color-ink) 6%, transparent);
+  border-inline-end: none;
+}
+
+.poem-reader--vertical .poem-reader__masthead .poem-reader__title,
+.poem-reader--vertical .poem-reader__masthead .poem-reader__meta {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+}
+
+.poem-reader--vertical .poem-reader__masthead .poem-reader__title {
   margin: 0;
-  text-align: start;
+  font-size: clamp(1.375rem, 3.8vw, 1.75rem);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  line-height: 1.8;
 }
 
-.poem-reader--vertical .breadcrumbs__list {
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 0;
-}
-
-.poem-reader--vertical .breadcrumbs__item {
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-/* 诗题列 */
-.poem-reader--vertical .poem-reader__title-column {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.poem-reader--vertical .poem-reader__title {
-  font-size: clamp(1.5rem, 4.2vw, 1.875rem);
-  letter-spacing: 0.1em;
+.poem-reader--vertical .poem-reader__masthead .poem-reader__meta {
+  margin: 0;
+  font-size: clamp(0.75rem, 2.2vw, 0.8125rem);
+  color: var(--color-ink-muted);
+  letter-spacing: 0.08em;
   line-height: 1.75;
 }
 
-/* 卷名·作者列 */
-.poem-reader--vertical .poem-reader__meta-column {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.poem-reader--vertical .poem-reader__meta {
-  margin: 0;
-  font-size: clamp(0.8125rem, 2.4vw, 0.875rem);
-  letter-spacing: 0.06em;
-}
-
-/* 正文列：四句一列，每句自上而下，字直立 */
+/* 正文列：每句一纵列，四句自右向左 */
 .poem-reader--vertical .poem-reader__body-column {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
-  gap: 0.5em;
+  gap: 0.65em;
+  flex-shrink: 0;
 }
 
 .poem-reader--vertical .poem-reader__line {
-  display: inline-block;
   margin: 0;
-  font-size: clamp(1.0625rem, 3.2vw, 1.25rem);
-  /* 竖排列距略紧于横排行距，一列内字形连贯 */
-  line-height: 1.9;
-  letter-spacing: 0.05em;
-  /* 无 hanging-punctuation 支持时，为列首标点留半角探出空间 */
-  padding-block-start: 0.12em;
+  font-size: clamp(1.0625rem, 3vw, 1.25rem);
+  line-height: 2;
+  letter-spacing: 0.08em;
+  padding-block-start: 0.1em;
+}
+
+.poem-reader--vertical .poem-reader__line--lineage {
+  padding: 0;
 }
 
 .poem-reader--vertical .poem-reader__lineage-mark {
-  display: inline-block;
-  margin-inline-start: 0.35em;
-  margin-block-start: 0;
-  vertical-align: baseline;
+  display: inline;
+  margin-inline-start: 0.2em;
+  font-size: 0.62em;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--color-ink) 36%, transparent);
   writing-mode: inherit;
   text-orientation: upright;
 }
 
-/*
- * 校勘/异文区：竖排但用混合方向——汉字仍竖排，阿拉伯数字、拉丁字母、
- * 卷次用 text-combine-upright: digits 横排嵌入，按正常方向可读。
- */
-.poem-reader--vertical .poem-reader__collation {
-  text-orientation: mixed;
-  text-combine-upright: digits 2;
-  display: inline-block;
-  margin: 0;
-  padding-block-start: 0;
-  padding-inline-start: clamp(1em, 3vw, 1.5em);
-  border-top: none;
-  border-inline-start: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
-  text-align: start;
-  font-size: clamp(0.75rem, 2.2vw, 0.8125rem);
-  line-height: 1.85;
-  letter-spacing: 0.05em;
-  max-width: none;
-}
-
-.poem-reader--vertical .poem-reader__variants {
-  margin-block-start: 1em;
-}
-
-.poem-reader--vertical .poem-reader__variant {
-  display: inline-block;
-}
-
-.poem-reader--vertical .poem-reader__variant + .poem-reader__variant {
-  margin-block-start: 1.25em;
-}
-
-.poem-reader--vertical .poem-reader__variant-mark,
-.poem-reader--vertical .poem-reader__variant-at {
-  display: inline;
-}
-
-/* 上/下一首列：竖排，标签在上、标题在下 */
-.poem-reader--vertical .poem-nav {
-  max-width: none;
-  margin-top: 0;
-  padding-top: 0;
-  border-top: none;
-  border-inline-start: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
-  padding-inline-start: clamp(1em, 3vw, 1.5em);
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1.5em;
-}
-
-.poem-reader--vertical .poem-nav__link {
-  max-width: none;
-  text-align: start;
-}
-
-.poem-reader--vertical .poem-nav__link--next {
-  align-items: flex-start;
-  text-align: start;
+/* 底栏：同卷导航横排；分隔线只由 .poem-nav 画一条 */
+.poem-reader__vertical-foot {
+  flex-shrink: 0;
+  writing-mode: horizontal-tb;
+  max-width: 36rem;
+  width: 100%;
+  margin-inline: auto;
+  padding-block: clamp(0.5rem, 2vh, 1rem) 0;
+  padding-inline: clamp(0.5rem, 3vw, 1rem);
 }
 .catalog__site-title {
   display: inline-block;
@@ -888,6 +816,10 @@ body {
 
 .poem-nav__spacer {
   flex: 1;
+}
+
+.poem-reader--vertical .poem-reader__vertical-foot .poem-nav {
+  margin-top: 0;
 }
 
 /* 目录页：克制、像书的目录 */

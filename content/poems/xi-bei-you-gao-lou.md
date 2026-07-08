@@ -5,13 +5,6 @@ authorSlug: gu-shi-shi-jiu-shou
 dynasty: 漢
 volume: han
 base: 《古詩源·卷四》沈德潛 中華書局點校本
-variants:
-  - line: 9
-    at: 雙鳴鶴
-    note: 逯欽立《先秦漢魏晉南北朝詩》、《文選》多作「雙鴻鵠」。
-  - line: 4
-    at: 無乃杞梁妻
-    note: 一作「乃杞梁妻」；逯欽立同底本。
 ---
 
 西北有高樓，上與浮雲齊。
