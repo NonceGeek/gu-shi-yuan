@@ -105,7 +105,8 @@ export function PoemReader({
     persistReadingDirection(localStorage, value);
   }
 
-  const poemContent = (
+  // 横排：标题+朝代作者合一，正文逐行
+  const horizontalContent = (
     <>
       <header className="poem-reader__header">
         <h1 className="poem-reader__title">{poem.title}</h1>
@@ -185,23 +186,56 @@ export function PoemReader({
 
       <div className="poem-reader__viewport">
         <ReadingDirectionProvider direction={direction}>
-          <div className="poem-reader__sheet">
-            <Breadcrumbs items={breadcrumbs} />
-            {direction === "vertical" ? (
-              <div ref={viewportRef} className="poem-reader__columns-viewport">
-                <div className="poem-reader__columns">
-                  {poemContent}
-                  {collationFooter}
+          {direction === "vertical" ? (
+            <div ref={viewportRef} className="poem-reader__columns-viewport">
+              {/*
+                竖排：横排自上而下的每个块，竖排自右向左各成一列。
+                列序（右→左）：面包屑 → 诗题 → 卷名·作者 → 正文（四句一列）
+                → 异文校勘 → 上/下一首。row-reverse 让首块落最右=首列。
+              */}
+              <div className="poem-reader__columns">
+                <Breadcrumbs items={breadcrumbs} />
+                <div className="poem-reader__title-column">
+                  <h1 className="poem-reader__title">{poem.title}</h1>
                 </div>
-              </div>
-            ) : (
-              <>
-                {poemContent}
+                <div className="poem-reader__meta-column">
+                  <p className="poem-reader__meta">
+                    {poem.dynasty}·{poem.author}
+                  </p>
+                </div>
+                {lineColumns.map((columnLines, colIndex) => {
+                  const startLineIndex = colIndex * LINES_PER_COLUMN;
+                  return (
+                    <div
+                      key={`col-${colIndex}`}
+                      className="poem-reader__body-column"
+                    >
+                      {columnLines.map((line, offset) => {
+                        const lineIndex = startLineIndex + offset;
+                        return (
+                          <PoemLine
+                            key={`${lineIndex}-${line}`}
+                            line={line}
+                            lineIndex={lineIndex}
+                            lineageClue={lineageByLine.get(lineIndex)}
+                          />
+                        );
+                      })}
+                    </div>
+                  );
+                })}
                 {collationFooter}
-              </>
-            )}
-            <PoemNav prev={prev} next={next} />
-          </div>
+                <PoemNav prev={prev} next={next} />
+              </div>
+            </div>
+          ) : (
+            <div className="poem-reader__sheet">
+              <Breadcrumbs items={breadcrumbs} />
+              {horizontalContent}
+              {collationFooter}
+              <PoemNav prev={prev} next={next} />
+            </div>
+          )}
         </ReadingDirectionProvider>
       </div>
     </main>
