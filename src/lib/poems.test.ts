@@ -119,6 +119,14 @@ describe("getPoemsByVolume", () => {
     ]);
   });
 
+  it("orders gu-yi poems by volume manifest", () => {
+    const poems = getPoemsByVolume("gu-yi");
+
+    expect(poems.length).toBeGreaterThanOrEqual(4);
+    expect(poems[0]?.slug).toBe("ji-rang-ge");
+    expect(poems.at(-1)?.slug).toBe("gu-yan-gu-yu");
+  });
+
   it("returns an empty list for a volume with no poems", () => {
     expect(getPoemsByVolume("jin")).toEqual([]);
   });

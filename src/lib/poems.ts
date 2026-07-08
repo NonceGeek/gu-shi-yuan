@@ -29,6 +29,31 @@ export type Poem = PoemMeta & {
 const CONTENT_DIR = path.join(process.cwd(), "content");
 const POEMS_DIR = path.join(CONTENT_DIR, "poems");
 const VOLUMES_FILE = path.join(CONTENT_DIR, "volumes.json");
+const VOLUME_MANIFEST_DIR = path.join(CONTENT_DIR, "volumes");
+
+function getVolumeManifest(volumeSlug: string): string[] | undefined {
+  const manifestPath = path.join(
+    VOLUME_MANIFEST_DIR,
+    `${volumeSlug}-manifest.json`,
+  );
+  if (!fs.existsSync(manifestPath)) {
+    return undefined;
+  }
+  const raw = fs.readFileSync(manifestPath, "utf-8");
+  return JSON.parse(raw) as string[];
+}
+
+function sortByManifestOrder<T extends { slug: string }>(
+  items: T[],
+  manifest: string[],
+): T[] {
+  const order = new Map(manifest.map((slug, index) => [slug, index]));
+  return [...items].sort(
+    (a, b) =>
+      (order.get(a.slug) ?? Number.MAX_SAFE_INTEGER) -
+      (order.get(b.slug) ?? Number.MAX_SAFE_INTEGER),
+  );
+}
 
 function requireField(
   data: Record<string, unknown>,
@@ -101,37 +126,56 @@ export function getVolumeBySlug(slug: string): Volume | undefined {
 }
 
 export function getAuthorsByVolume(volumeSlug: string): AuthorMeta[] {
-  const seen = new Map<string, AuthorMeta>();
+  const manifest = getVolumeManifest(volumeSlug);
+  const volumePoems = getAllPoems().filter((p) => p.volume === volumeSlug);
+  const orderedPoems = manifest
+    ? sortByManifestOrder(volumePoems, manifest)
+    : volumePoems.sort((a, b) => {
+        const byAuthor = a.author.localeCompare(b.author, "zh-CN");
+        return byAuthor !== 0
+          ? byAuthor
+          : a.title.localeCompare(b.title, "zh-CN");
+      });
 
-  for (const poem of getAllPoems()) {
-    if (poem.volume !== volumeSlug) continue;
+  const seen = new Map<string, AuthorMeta>();
+  for (const poem of orderedPoems) {
     if (!seen.has(poem.authorSlug)) {
       seen.set(poem.authorSlug, { slug: poem.authorSlug, name: poem.author });
     }
   }
 
-  return [...seen.values()].sort((a, b) =>
-    a.name.localeCompare(b.name, "zh-CN"),
-  );
+  return [...seen.values()];
 }
 
 export function getPoemsByAuthor(
   volumeSlug: string,
   authorSlug: string,
 ): PoemMeta[] {
-  return getAllPoems()
-    .filter((p) => p.volume === volumeSlug && p.authorSlug === authorSlug)
-    .sort((a, b) => a.title.localeCompare(b.title, "zh-CN"));
+  const manifest = getVolumeManifest(volumeSlug);
+  const poems = getAllPoems().filter(
+    (p) => p.volume === volumeSlug && p.authorSlug === authorSlug,
+  );
+
+  if (manifest) {
+    return sortByManifestOrder(poems, manifest);
+  }
+
+  return poems.sort((a, b) => a.title.localeCompare(b.title, "zh-CN"));
 }
 
 export function getPoemsByVolume(volumeSlug: string): PoemMeta[] {
-  const poems: PoemMeta[] = [];
+  const manifest = getVolumeManifest(volumeSlug);
+  const poems = getAllPoems().filter((p) => p.volume === volumeSlug);
 
-  for (const author of getAuthorsByVolume(volumeSlug)) {
-    poems.push(...getPoemsByAuthor(volumeSlug, author.slug));
+  if (manifest) {
+    return sortByManifestOrder(poems, manifest);
   }
 
-  return poems;
+  const result: PoemMeta[] = [];
+  for (const author of getAuthorsByVolume(volumeSlug)) {
+    result.push(...getPoemsByAuthor(volumeSlug, author.slug));
+  }
+  return result;
 }
 
 export function getAdjacentPoemsInVolume(slug: string): {

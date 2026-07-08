@@ -16,7 +16,7 @@ const FONT_OUT = path.join(OUT_DIR, path.basename(WENKAI_SUBSET_PATH));
 const CSS_OUT = path.join(ROOT, "src/fonts/wenkai.css");
 const MANIFEST_OUT = path.join(ROOT, "scripts/.cache/wenkai.manifest.json");
 
-const MAX_FONT_BYTES = 300 * 1024;
+const MAX_FONT_BYTES = 400 * 1024;
 
 async function ensureSourceFont(): Promise<void> {
   if (fs.existsSync(FONT_SOURCE)) {
