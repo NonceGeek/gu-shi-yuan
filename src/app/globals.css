@@ -1,0 +1,57 @@
+@import "@fontsource/lxgw-wenkai/index.css";
+@import "tailwindcss";
+
+:root {
+  --color-paper: #faf8f4;
+  --color-ink: #2c2a26;
+  --color-ink-muted: #6b6560;
+}
+
+@theme inline {
+  --font-wenkai: "LXGW WenKai", serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-wenkai), serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 阅读页中文排版：字面功夫用 CSS，骨架交给 Tailwind */
+.poem-reader__title {
+  font-size: 1.75rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  line-height: 1.6;
+}
+
+.poem-reader__meta {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--color-ink-muted);
+  letter-spacing: 0.08em;
+}
+
+.poem-reader__line {
+  font-size: 1.25rem;
+  line-height: 2.2;
+  letter-spacing: 0.06em;
+}
+
+@media (min-width: 768px) {
+  .poem-reader__title {
+    font-size: 2rem;
+  }
+
+  .poem-reader__line {
+    font-size: 1.375rem;
+    line-height: 2.4;
+  }
+}
