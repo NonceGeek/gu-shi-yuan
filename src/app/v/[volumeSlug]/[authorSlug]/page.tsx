@@ -50,12 +50,10 @@ export default async function AuthorPage({ params }: PageProps) {
   const poems = getPoemsByAuthor(volumeSlug, authorSlug);
 
   return (
-    <CatalogLayout title={author.name}>
-      <p className="catalog__breadcrumb">
-        <Link href={`/v/${volumeSlug}`} className="catalog__breadcrumb-link">
-          {volume.name}
-        </Link>
-      </p>
+    <CatalogLayout
+      title={author.name}
+      breadcrumbs={[{ label: volume.name, href: `/v/${volumeSlug}` }]}
+    >
       <nav aria-label={`${author.name}诗作`}>
         <ol className="catalog__list">
           {poems.map((poem) => (

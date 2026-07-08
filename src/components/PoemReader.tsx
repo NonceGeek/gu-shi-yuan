@@ -1,9 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { BreadcrumbItem } from "@/components/Breadcrumbs";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { PoemNav } from "@/components/PoemNav";
+import { PoemLine } from "@/components/PoemLine";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { Character } from "@/lib/character-types";
 import type { LineageByLine } from "@/lib/lineage";
-import type { Poem } from "@/lib/poems";
+import type { Poem, PoemMeta } from "@/lib/poems";
 import {
   DEFAULT_READING_DIRECTION,
   type ReadingDirection,
@@ -11,16 +16,24 @@ import {
   readStoredReadingDirection,
 } from "@/lib/reading-direction";
 import { cn } from "@/lib/utils";
-import { PoemLine } from "@/components/PoemLine";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type PoemReaderProps = {
   poem: Poem;
+  breadcrumbs: BreadcrumbItem[];
+  prev?: PoemMeta;
+  next?: PoemMeta;
   keyCharacters: Record<string, Character>;
   lineageByLine: LineageByLine;
 };
 
-export function PoemReader({ poem, keyCharacters, lineageByLine }: PoemReaderProps) {
+export function PoemReader({
+  poem,
+  breadcrumbs,
+  prev,
+  next,
+  keyCharacters,
+  lineageByLine,
+}: PoemReaderProps) {
   const lines = poem.body.split("\n").filter(Boolean);
   const [direction, setDirection] = useState<ReadingDirection>(
     DEFAULT_READING_DIRECTION,
@@ -40,7 +53,8 @@ export function PoemReader({ poem, keyCharacters, lineageByLine }: PoemReaderPro
   }
 
   return (
-    <article
+    <main
+      id="main-content"
       className={cn(
         "poem-reader relative flex min-h-dvh flex-col items-center justify-center px-8 py-16 md:px-12 md:py-24",
         direction === "vertical" && "poem-reader--vertical",
@@ -50,9 +64,9 @@ export function PoemReader({ poem, keyCharacters, lineageByLine }: PoemReaderPro
         <ToggleGroup
           value={[direction]}
           onValueChange={(value) => {
-            const next = value.at(-1);
-            if (next) {
-              handleDirectionChange(next);
+            const nextDirection = value.at(-1);
+            if (nextDirection) {
+              handleDirectionChange(nextDirection);
             }
           }}
           variant="outline"
@@ -70,6 +84,7 @@ export function PoemReader({ poem, keyCharacters, lineageByLine }: PoemReaderPro
       </div>
 
       <div className="poem-reader__sheet">
+        <Breadcrumbs items={breadcrumbs} />
         <header className="poem-reader__header">
           <h1 className="poem-reader__title">{poem.title}</h1>
           <p className="poem-reader__meta">
@@ -112,7 +127,8 @@ export function PoemReader({ poem, keyCharacters, lineageByLine }: PoemReaderPro
             )}
           </footer>
         )}
+        <PoemNav prev={prev} next={next} />
       </div>
-    </article>
+    </main>
   );
 }

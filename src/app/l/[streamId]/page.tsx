@@ -45,7 +45,10 @@ export default async function StreamPage({ params }: PageProps) {
   const sourceHref = `/p/${clue.source.poemSlug}#line-${clue.source.lineIndex}`;
 
   return (
-    <main className="lineage-page mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-8 py-16 md:px-12 md:py-24">
+    <main
+      id="main-content"
+      className="lineage-page mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-8 py-16 md:px-12 md:py-24"
+    >
       <p className="lineage-page__label">后世名句</p>
       <blockquote className="lineage-page__quote">{stream.text}</blockquote>
       <p className="lineage-page__meta">
@@ -67,12 +70,6 @@ export default async function StreamPage({ params }: PageProps) {
           </span>
         </Link>
       </section>
-
-      <p className="lineage-page__back">
-        <Link href="/" className="catalog__site-title">
-          古诗源
-        </Link>
-      </p>
     </main>
   );
 }

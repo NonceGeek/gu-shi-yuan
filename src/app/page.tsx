@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CatalogLayout } from "@/components/CatalogLayout";
-import { getAllVolumes } from "@/lib/poems";
+import { getAllVolumes, isVolumeEmpty } from "@/lib/poems";
 
 export default function HomePage() {
   const volumes = getAllVolumes();
@@ -9,13 +9,26 @@ export default function HomePage() {
     <CatalogLayout title="目录">
       <nav aria-label="朝代分卷">
         <ol className="catalog__list">
-          {volumes.map((volume) => (
-            <li key={volume.slug} className="catalog__item">
-              <Link href={`/v/${volume.slug}`} className="catalog__link">
-                {volume.name}
-              </Link>
-            </li>
-          ))}
+          {volumes.map((volume) => {
+            const empty = isVolumeEmpty(volume.slug);
+
+            return (
+              <li key={volume.slug} className="catalog__item">
+                {empty ? (
+                  <>
+                    <span className="catalog__link catalog__link--disabled">
+                      {volume.name}
+                    </span>
+                    <span className="catalog__meta">整理中</span>
+                  </>
+                ) : (
+                  <Link href={`/v/${volume.slug}`} className="catalog__link">
+                    {volume.name}
+                  </Link>
+                )}
+              </li>
+            );
+          })}
         </ol>
       </nav>
     </CatalogLayout>

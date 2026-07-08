@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SiteSearch } from "@/components/SiteSearch";
+import { SiteChrome } from "@/components/SiteChrome";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { buildSearchIndex } from "@/lib/search-index";
 import {
@@ -26,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body>
-        <SiteSearch index={searchIndex} />
+        <SiteChrome searchIndex={searchIndex} />
         <TooltipProvider delay={200}>{children}</TooltipProvider>
       </body>
     </html>

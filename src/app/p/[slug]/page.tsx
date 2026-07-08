@@ -3,7 +3,12 @@ import { notFound } from "next/navigation";
 import { PoemReader } from "@/components/PoemReader";
 import { getKeyCharacterMap } from "@/lib/characters";
 import { getLineageForPoem } from "@/lib/lineage";
-import { getAllPoems, getPoemBySlug } from "@/lib/poems";
+import {
+  getAdjacentPoemsInVolume,
+  getAllPoems,
+  getPoemBySlug,
+  getVolumeBySlug,
+} from "@/lib/poems";
 import { createPageMetadata } from "@/lib/site-metadata";
 
 type PageProps = {
@@ -33,12 +38,28 @@ export default async function PoemPage({ params }: PageProps) {
     notFound();
   }
 
+  const volume = getVolumeBySlug(poem.volume);
+  if (!volume) {
+    notFound();
+  }
+
+  const { prev, next } = getAdjacentPoemsInVolume(slug);
   const keyCharacters = getKeyCharacterMap(poem.keyChars);
   const lineageByLine = getLineageForPoem(slug);
 
   return (
     <PoemReader
       poem={poem}
+      breadcrumbs={[
+        { label: volume.name, href: `/v/${volume.slug}` },
+        {
+          label: poem.author,
+          href: `/v/${volume.slug}/${poem.authorSlug}`,
+        },
+        { label: poem.title },
+      ]}
+      prev={prev}
+      next={next}
       keyCharacters={keyCharacters}
       lineageByLine={lineageByLine}
     />
