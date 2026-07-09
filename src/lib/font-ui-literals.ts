@@ -1,9 +1,11 @@
 import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/site-metadata";
+import { SITE_UI_TEXT_SIMPLIFIED } from "@/lib/site-ui-text";
 
 /** 站点 UI 固定文案。新增可见中文 UI 时同步更新。 */
 export const FONT_UI_LITERALS =
   SITE_NAME +
   SITE_DESCRIPTION +
+  Object.values(SITE_UI_TEXT_SIMPLIFIED).join("") +
   "化用脱胎意象承接" +
   "跳到正文" +
   "阅读方向横排横竖排竖" +

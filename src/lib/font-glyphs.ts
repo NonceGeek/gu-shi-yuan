@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { FONT_UI_LITERALS } from "@/lib/font-ui-literals";
+import { toTraditional } from "@/lib/script-conversion";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
 
@@ -78,10 +79,15 @@ export function collectSiteFontGlyphs(
   const codePoints: number[] = [
     ...extractCodePoints(FONT_GLYPH_FALLBACK),
     ...extractCodePoints(uiLiterals),
+    ...extractCodePoints(toTraditional(uiLiterals)),
   ];
 
   for (const file of walkFiles(contentRoot, [".md", ".json"])) {
-    codePoints.push(...extractCodePoints(fs.readFileSync(file, "utf8")));
+    const content = fs.readFileSync(file, "utf8");
+    codePoints.push(
+      ...extractCodePoints(content),
+      ...extractCodePoints(toTraditional(content)),
+    );
   }
 
   if (options?.extraCodePoints) {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SiteChromeProvider } from "@/components/SiteChrome";
+import { buildSiteUiText } from "@/lib/script-conversion";
 import { buildSearchIndex } from "@/lib/search-index";
 import {
   createPageMetadata,
@@ -23,11 +24,12 @@ export default function RootLayout({
 }>) {
   preloadWenkaiSubset();
   const searchIndex = buildSearchIndex();
+  const uiText = buildSiteUiText();
 
   return (
     <html lang="zh-CN">
       <body>
-        <SiteChromeProvider searchIndex={searchIndex}>
+        <SiteChromeProvider searchIndex={searchIndex} uiText={uiText}>
           {children}
         </SiteChromeProvider>
       </body>

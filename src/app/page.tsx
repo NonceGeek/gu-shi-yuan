@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { CatalogLayout } from "@/components/CatalogLayout";
+import { VariantText } from "@/components/VariantText";
 import { getAllVolumes, isVolumeEmpty } from "@/lib/poems";
+import { makeTextVariant } from "@/lib/script-conversion";
 
 export default function HomePage() {
   const volumes = getAllVolumes();
 
   return (
-    <CatalogLayout title="目录">
+    <CatalogLayout title={makeTextVariant("目录")}>
       <nav aria-label="古诗源分卷">
         <ol className="catalog__list">
           {volumes.map((volume) => {
@@ -17,13 +19,15 @@ export default function HomePage() {
                 {empty ? (
                   <>
                     <span className="catalog__link catalog__link--disabled">
-                      {volume.name}
+                      <VariantText text={makeTextVariant(volume.name)} />
                     </span>
-                    <span className="catalog__meta">整理中</span>
+                    <span className="catalog__meta">
+                      <VariantText text={makeTextVariant("整理中")} />
+                    </span>
                   </>
                 ) : (
                   <Link href={`/v/${volume.slug}`} className="catalog__link">
-                    {volume.name}
+                    <VariantText text={makeTextVariant(volume.name)} />
                   </Link>
                 )}
               </li>

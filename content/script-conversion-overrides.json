@@ -1,0 +1,32 @@
+[
+  {
+    "source": "诗云",
+    "traditional": "詩云",
+    "note": "古文引述义，云为曰，不作雲。"
+  },
+  {
+    "source": "子曰诗云",
+    "traditional": "子曰詩云",
+    "note": "整词覆盖，避免后续词典变动。"
+  },
+  {
+    "source": "皇后",
+    "traditional": "皇后",
+    "note": "后为君后，不作後。"
+  },
+  {
+    "source": "千里",
+    "traditional": "千里",
+    "note": "里为距离单位，不作裏。"
+  },
+  {
+    "source": "万里",
+    "traditional": "萬里",
+    "note": "里为距离单位，不作裏。"
+  },
+  {
+    "source": "故里",
+    "traditional": "故里",
+    "note": "里为乡里，不作裏。"
+  }
+]

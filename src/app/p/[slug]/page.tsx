@@ -9,6 +9,12 @@ import {
   getPoemBySlug,
   getVolumeBySlug,
 } from "@/lib/poems";
+import {
+  makeTextVariant,
+  withTraditionalLineage,
+  withTraditionalPoem,
+  withTraditionalPoemMeta,
+} from "@/lib/script-conversion";
 import { createPageMetadata } from "@/lib/site-metadata";
 
 type PageProps = {
@@ -48,18 +54,18 @@ export default async function PoemPage({ params }: PageProps) {
 
   return (
     <PoemReader
-      poem={poem}
+      poem={withTraditionalPoem(poem)}
       breadcrumbs={[
-        { label: volume.name, href: `/v/${volume.slug}` },
+        { label: makeTextVariant(volume.name), href: `/v/${volume.slug}` },
         {
-          label: poem.author,
+          label: makeTextVariant(poem.author),
           href: `/v/${volume.slug}/${getCatalogAuthorSlug(poem)}`,
         },
-        { label: poem.title },
+        { label: makeTextVariant(poem.title) },
       ]}
-      prev={prev}
-      next={next}
-      lineageByLine={lineageByLine}
+      prev={prev ? withTraditionalPoemMeta(prev) : undefined}
+      next={next ? withTraditionalPoemMeta(next) : undefined}
+      lineageByLine={withTraditionalLineage(lineageByLine)}
     />
   );
 }

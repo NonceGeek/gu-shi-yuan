@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CatalogLayout } from "@/components/CatalogLayout";
+import { VariantText } from "@/components/VariantText";
 import {
   getAllVolumes,
   getAuthorsByVolume,
   getVolumeBySlug,
 } from "@/lib/poems";
+import { makeTextVariant } from "@/lib/script-conversion";
 import { createPageMetadata } from "@/lib/site-metadata";
 
 type PageProps = {
@@ -36,9 +38,11 @@ export default async function VolumePage({ params }: PageProps) {
   const authors = getAuthorsByVolume(volumeSlug);
 
   return (
-    <CatalogLayout title={volume.name}>
+    <CatalogLayout title={makeTextVariant(volume.name)}>
       {authors.length === 0 ? (
-        <p className="catalog__empty">此卷尚无收录。</p>
+        <p className="catalog__empty">
+          <VariantText text={makeTextVariant("此卷尚无收录。")} />
+        </p>
       ) : (
         <nav aria-label={`${volume.name}诗人`}>
           <ol className="catalog__list">
@@ -48,7 +52,7 @@ export default async function VolumePage({ params }: PageProps) {
                   href={`/v/${volumeSlug}/${author.slug}`}
                   className="catalog__link"
                 >
-                  {author.name}
+                  <VariantText text={makeTextVariant(author.name)} />
                 </Link>
               </li>
             ))}

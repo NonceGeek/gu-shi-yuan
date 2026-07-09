@@ -61,6 +61,21 @@ describe("collectSiteFontGlyphs", () => {
     for (const char of "关关雎鸠检索面板") {
       expect(glyphs).toContain(char.codePointAt(0));
     }
+    for (const char of "關關雎鳩檢索面板") {
+      expect(glyphs).toContain(char.codePointAt(0));
+    }
+  });
+
+  it("includes derived traditional code points from content", () => {
+    const contentRoot = makeTempContent({
+      "poems/test.md": "古诗源陶渊明",
+    });
+
+    const glyphs = collectSiteFontGlyphs({ contentRoot, uiLiterals: "" });
+
+    for (const char of "古詩源陶淵明") {
+      expect(glyphs).toContain(char.codePointAt(0));
+    }
   });
 
   it("includes common punctuation from FONT_GLYPH_FALLBACK", () => {

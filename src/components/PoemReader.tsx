@@ -1,16 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { BreadcrumbItem } from "@/components/Breadcrumbs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PoemNav } from "@/components/PoemNav";
 import { PoemLine } from "@/components/PoemLine";
 import { ReadingDirectionProvider } from "@/components/ReadingDirectionProvider";
 import { ReadingDirectionToggle } from "@/components/ReadingDirectionToggle";
+import {
+  useScriptVariant,
+  useVariantText,
+} from "@/components/ScriptVariantProvider";
 import { SiteChromeActions } from "@/components/SiteChromeActions";
-import type { LineageByLine } from "@/lib/lineage";
+import type {
+  LineageByLineWithTraditional,
+  PoemMetaWithTraditional,
+  PoemWithTraditional,
+} from "@/lib/script-conversion";
 import { parsePoemBody } from "@/lib/poem-body";
-import type { Poem, PoemMeta } from "@/lib/poems";
 import {
   DEFAULT_READING_DIRECTION,
   type ReadingDirection,
@@ -42,11 +49,11 @@ function PoemAttribution({
 }
 
 type PoemReaderProps = {
-  poem: Poem;
+  poem: PoemWithTraditional;
   breadcrumbs: BreadcrumbItem[];
-  prev?: PoemMeta;
-  next?: PoemMeta;
-  lineageByLine: LineageByLine;
+  prev?: PoemMetaWithTraditional;
+  next?: PoemMetaWithTraditional;
+  lineageByLine: LineageByLineWithTraditional;
 };
 
 export function PoemReader({
@@ -56,9 +63,29 @@ export function PoemReader({
   next,
   lineageByLine,
 }: PoemReaderProps) {
-  const { chapters } = parsePoemBody(poem.body);
-  const chapterOffsets = chapterSentenceOffsets(chapters);
-  const verticalChapters = groupVerticalColumnsByChapter(chapters);
+  const { variant } = useScriptVariant();
+  const title = useVariantText({
+    simplified: poem.title,
+    traditional: poem.titleTraditional,
+  });
+  const author = useVariantText({
+    simplified: poem.author,
+    traditional: poem.authorTraditional,
+  });
+  const dynasty = useVariantText({
+    simplified: poem.dynasty,
+    traditional: poem.dynastyTraditional,
+  });
+  const body = useVariantText({
+    simplified: poem.body,
+    traditional: poem.bodyTraditional,
+  });
+  const { chapters } = useMemo(() => parsePoemBody(body), [body]);
+  const chapterOffsets = useMemo(() => chapterSentenceOffsets(chapters), [chapters]);
+  const verticalChapters = useMemo(
+    () => groupVerticalColumnsByChapter(chapters),
+    [chapters],
+  );
   const sentenceCount = chapters.reduce(
     (total, chapter) => total + chapter.length,
     0,
@@ -70,7 +97,10 @@ export function PoemReader({
   );
 
   useEffect(() => {
-    setDirection(readStoredReadingDirection(localStorage));
+    const frame = requestAnimationFrame(() => {
+      setDirection(readStoredReadingDirection(localStorage));
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
@@ -115,7 +145,7 @@ export function PoemReader({
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [direction, sentenceCount]);
+  }, [direction, sentenceCount, variant]);
 
   function handleDirectionChange(value: ReadingDirection) {
     setDirection(value);
@@ -125,8 +155,8 @@ export function PoemReader({
   const horizontalContent = (
     <>
       <header className="poem-reader__header">
-        <h1 className="poem-reader__title">{poem.title}</h1>
-        <PoemAttribution dynasty={poem.dynasty} author={poem.author} />
+        <h1 className="poem-reader__title">{title}</h1>
+        <PoemAttribution dynasty={dynasty} author={author} />
       </header>
       <div className="poem-reader__body">
         {chapters.map((sentences, chapterIndex) => {
@@ -184,8 +214,8 @@ export function PoemReader({
               <div ref={viewportRef} className="poem-reader__columns-viewport">
                 <div className="poem-reader__columns">
                   <header className="poem-reader__masthead">
-                    <h1 className="poem-reader__title">{poem.title}</h1>
-                    <PoemAttribution dynasty={poem.dynasty} author={poem.author} />
+                    <h1 className="poem-reader__title">{title}</h1>
+                    <PoemAttribution dynasty={dynasty} author={author} />
                   </header>
                   {verticalChapters.map((columns, chapterIndex) => {
                     const startLineIndex = chapterOffsets[chapterIndex] ?? 0;

@@ -1,8 +1,37 @@
-/**
- * 语言切换占位：结构位已就绪，本体由简繁切片（#22）实现。
- * 当前不渲染任何内容，仅占住导航 actions 容器中的位置，
- * 使后续切片无需再动顶栏 actions 布局。
- */
+"use client";
+
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  useScriptVariant,
+  useUiText,
+} from "@/components/ScriptVariantProvider";
+
 export function LanguageToggle() {
-  return null;
+  const { variant, setVariant } = useScriptVariant();
+  const ariaLabel = useUiText("languageToggleAria");
+  const simplified = useUiText("languageSimplified");
+  const traditional = useUiText("languageTraditional");
+
+  return (
+    <ToggleGroup
+      value={[variant]}
+      onValueChange={(value) => {
+        const nextVariant = value.at(-1);
+        if (nextVariant === "simplified" || nextVariant === "traditional") {
+          setVariant(nextVariant);
+        }
+      }}
+      variant="outline"
+      size="sm"
+      spacing={0}
+      aria-label={ariaLabel}
+    >
+      <ToggleGroupItem value="simplified" aria-label={simplified}>
+        {simplified}
+      </ToggleGroupItem>
+      <ToggleGroupItem value="traditional" aria-label={traditional}>
+        {traditional}
+      </ToggleGroupItem>
+    </ToggleGroup>
+  );
 }

@@ -37,6 +37,10 @@
 
 横排（默认）/ 竖排（列自右向左）。偏好存 localStorage，key `gushiyuan-reading-direction`。注解浮层方向随阅读方向：横排在下、竖排在左。
 
+## 简繁切换（script variant）
+
+简体 Markdown 是唯一权威内容源；繁体由构建期 OpenCC s2t 派生，并叠加 `content/script-conversion-overrides.json` 的古文语境覆盖表。客户端只在已内嵌的简体/繁体文本之间切换，偏好存 localStorage，key `gushiyuan-script-variant`；切换时 `<html lang>` 同步为 `zh-CN` / `zh-Hant`。见 ADR 0004。
+
 ## 字形演变（已移除）
 
 字形演变功能（`/c/[char]`、`content/characters/*`、`public/characters/*`）已整体移除（见 #18、ADR 0002）：字形数据不可靠且非核心价值。其点击 Popover 交互模式抽为通用组件 `AnnotationPopover`，迁用于「源」注解。移除后诗句按纯文本渲染，不再有关键字高亮与字形浮层。

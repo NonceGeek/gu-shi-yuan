@@ -4,6 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SearchIcon } from "lucide-react";
 import {
+  useScriptVariant,
+  useUiText,
+} from "@/components/ScriptVariantProvider";
+import {
   Command,
   CommandDialog,
   CommandEmpty,
@@ -14,6 +18,7 @@ import {
 } from "@/components/ui/command";
 import { filterSearchIndex } from "@/lib/search-filter";
 import type { SearchIndex } from "@/lib/search-index-types";
+import { textForScriptVariant } from "@/lib/script-variant";
 
 type SiteSearchProps = {
   index: SearchIndex;
@@ -21,6 +26,15 @@ type SiteSearchProps = {
 
 export function SiteSearch({ index }: SiteSearchProps) {
   const router = useRouter();
+  const { variant } = useScriptVariant();
+  const openSearch = useUiText("searchOpen");
+  const searchTitle = useUiText("searchTitle");
+  const searchDescription = useUiText("searchDescription");
+  const searchPlaceholder = useUiText("searchPlaceholder");
+  const searchNoMatch = useUiText("searchNoMatch");
+  const searchPrompt = useUiText("searchPrompt");
+  const searchPoemsHeading = useUiText("searchPoemsHeading");
+  const searchAuthorsHeading = useUiText("searchAuthorsHeading");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -65,7 +79,7 @@ export function SiteSearch({ index }: SiteSearchProps) {
         type="button"
         className="site-search__trigger"
         onClick={() => setOpen(true)}
-        aria-label="打开检索"
+        aria-label={openSearch}
       >
         <SearchIcon aria-hidden="true" className="size-3.5" />
       </button>
@@ -73,14 +87,14 @@ export function SiteSearch({ index }: SiteSearchProps) {
       <CommandDialog
         open={open}
         onOpenChange={setOpen}
-        title="站内检索"
-        description="按诗题或作者检索"
+        title={searchTitle}
+        description={searchDescription}
         className="border-[color-mix(in_srgb,var(--color-ink)_10%,transparent)] bg-[var(--color-paper)] text-[var(--color-ink)] sm:max-w-lg"
         showCloseButton
       >
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder="诗题、作者…"
+            placeholder={searchPlaceholder}
             value={query}
             onValueChange={setQuery}
             className="text-[var(--color-ink)] placeholder:text-[var(--color-ink-muted)]"
@@ -88,40 +102,67 @@ export function SiteSearch({ index }: SiteSearchProps) {
           <CommandList className="max-h-80">
             {!hasResults ? (
               <CommandEmpty className="text-[var(--color-ink-muted)]">
-                {query.trim() ? "未找到匹配" : "输入诗题或作者"}
+                {query.trim() ? searchNoMatch : searchPrompt}
               </CommandEmpty>
             ) : null}
 
             {results.poems.length > 0 ? (
-              <CommandGroup heading="诗">
-                {results.poems.map((poem) => (
-                  <CommandItem
-                    key={`poem-${poem.slug}`}
-                    value={`${poem.title} ${poem.author}`}
-                    onSelect={() => navigate(`/p/${poem.slug}`)}
-                  >
-                    <span>{poem.title}</span>
-                    <span className="ml-auto text-xs text-[var(--color-ink-muted)]">
-                      {poem.author}
-                    </span>
-                  </CommandItem>
-                ))}
+              <CommandGroup heading={searchPoemsHeading}>
+                {results.poems.map((poem) => {
+                  const title = textForScriptVariant(
+                    {
+                      simplified: poem.title,
+                      traditional: poem.titleTraditional,
+                    },
+                    variant,
+                  );
+                  const author = textForScriptVariant(
+                    {
+                      simplified: poem.author,
+                      traditional: poem.authorTraditional,
+                    },
+                    variant,
+                  );
+
+                  return (
+                    <CommandItem
+                      key={`poem-${poem.slug}`}
+                      value={`${poem.title} ${poem.titleTraditional} ${poem.author} ${poem.authorTraditional}`}
+                      onSelect={() => navigate(`/p/${poem.slug}`)}
+                    >
+                      <span>{title}</span>
+                      <span className="ml-auto text-xs text-[var(--color-ink-muted)]">
+                        {author}
+                      </span>
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             ) : null}
 
             {results.authors.length > 0 ? (
-              <CommandGroup heading="作者">
-                {results.authors.map((author) => (
-                  <CommandItem
-                    key={`author-${author.authorSlug}`}
-                    value={author.name}
-                    onSelect={() =>
-                      navigate(`/v/${author.volume}/${author.authorSlug}`)
-                    }
-                  >
-                    <span>{author.name}</span>
-                  </CommandItem>
-                ))}
+              <CommandGroup heading={searchAuthorsHeading}>
+                {results.authors.map((author) => {
+                  const name = textForScriptVariant(
+                    {
+                      simplified: author.name,
+                      traditional: author.nameTraditional,
+                    },
+                    variant,
+                  );
+
+                  return (
+                    <CommandItem
+                      key={`author-${author.authorSlug}`}
+                      value={`${author.name} ${author.nameTraditional}`}
+                      onSelect={() =>
+                        navigate(`/v/${author.volume}/${author.authorSlug}`)
+                      }
+                    >
+                      <span>{name}</span>
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             ) : null}
           </CommandList>

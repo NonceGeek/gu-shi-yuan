@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { CatalogLayout } from "@/components/CatalogLayout";
+import { VariantText } from "@/components/VariantText";
 import {
   ANONYMOUS_AUTHOR_SLUG,
   getAuthorPageParams,
@@ -10,6 +11,7 @@ import {
   getVolumeBySlug,
   isLegacyAnonymousAuthorSlug,
 } from "@/lib/poems";
+import { makeTextVariant } from "@/lib/script-conversion";
 import { createPageMetadata } from "@/lib/site-metadata";
 
 type PageProps = {
@@ -48,15 +50,15 @@ export default async function AuthorPage({ params }: PageProps) {
 
   return (
     <CatalogLayout
-      title={author.name}
-      breadcrumbs={[{ label: volume.name, href: `/v/${volumeSlug}` }]}
+      title={makeTextVariant(author.name)}
+      breadcrumbs={[{ label: makeTextVariant(volume.name), href: `/v/${volumeSlug}` }]}
     >
       <nav aria-label={`${author.name}诗作`}>
         <ol className="catalog__list">
           {poems.map((poem) => (
             <li key={poem.slug} className="catalog__item">
               <Link href={`/p/${poem.slug}`} className="catalog__link">
-                {poem.title}
+                <VariantText text={makeTextVariant(poem.title)} />
               </Link>
             </li>
           ))}

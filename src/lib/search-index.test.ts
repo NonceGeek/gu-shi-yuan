@@ -14,6 +14,9 @@ describe("buildSearchIndex", () => {
     expect(
       index.poems.every((p) => p.title && p.author && p.authorSlug && p.volume),
     ).toBe(true);
+    expect(index.poems.find((p) => p.slug === "yin-jiu")?.authorTraditional).toBe(
+      "陶潛",
+    );
   });
 
   it("lists distinct authors with volume metadata", () => {
@@ -27,7 +30,12 @@ describe("buildSearchIndex", () => {
     expect(jingKe?.volume).toBe("gu-yi");
     expect(index.poems.some((p) => p.authorSlug === "jing-ke")).toBe(true);
     expect(anonymous).toEqual([
-      { name: "佚名", authorSlug: "yi-ming", volume: "gu-yi" },
+      {
+        name: "佚名",
+        nameTraditional: "佚名",
+        authorSlug: "yi-ming",
+        volume: "gu-yi",
+      },
     ]);
   });
 
@@ -101,18 +109,30 @@ describe("filterSearchIndex", () => {
     expect(results.authors.some((a) => a.authorSlug === "jing-ke")).toBe(true);
   });
 
+  it("matches traditional poem and author queries", () => {
+    const poemResults = filterSearchIndex(index, "飲酒");
+    const authorResults = filterSearchIndex(index, "鮑照");
+
+    expect(poemResults.poems.some((p) => p.slug === "yin-jiu")).toBe(true);
+    expect(authorResults.authors.some((a) => a.name === "鲍照")).toBe(true);
+  });
+
   it("limits results to keep the palette concise", () => {
     const bigIndex: SearchIndex = {
       poems: Array.from({ length: 20 }, (_, index) => ({
         slug: `poem-${index}`,
         title: `测试诗${index}`,
+        titleTraditional: `測試詩${index}`,
         author: "测试作者",
+        authorTraditional: "測試作者",
         authorSlug: "test-author",
         volume: "han",
         dynasty: "汉",
+        dynastyTraditional: "漢",
       })),
       authors: Array.from({ length: 10 }, (_, index) => ({
         name: `作者${index}`,
+        nameTraditional: `作者${index}`,
         authorSlug: `author-${index}`,
         volume: "han",
       })),

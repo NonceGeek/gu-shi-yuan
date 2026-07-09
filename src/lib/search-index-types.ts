@@ -1,14 +1,18 @@
 export type SearchIndexPoem = {
   slug: string;
   title: string;
+  titleTraditional: string;
   author: string;
+  authorTraditional: string;
   authorSlug: string;
   volume: string;
   dynasty: string;
+  dynastyTraditional: string;
 };
 
 export type SearchIndexAuthor = {
   name: string;
+  nameTraditional: string;
   authorSlug: string;
   volume: string;
 };

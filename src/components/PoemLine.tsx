@@ -3,10 +3,20 @@
 import type { LineageClue } from "@/lib/lineage-types";
 import { LineageHint } from "@/components/LineageHint";
 
+type LineageClueWithTraditional = Omit<LineageClue, "streams"> & {
+  streams: (LineageClue["streams"][number] & {
+    textTraditional?: string;
+    authorTraditional?: string;
+    workTraditional?: string;
+    relationTraditional?: string;
+    sourceTraditional?: string;
+  })[];
+};
+
 type PoemSentenceProps = {
   sentence: string;
   lineIndex: number;
-  lineageClue?: LineageClue;
+  lineageClue?: LineageClueWithTraditional;
   inline?: boolean;
 };
 
@@ -42,7 +52,7 @@ export function PoemSentence({
 type PoemLineProps = {
   line: string;
   lineIndex: number;
-  lineageClue?: LineageClue;
+  lineageClue?: LineageClueWithTraditional;
 };
 
 export function PoemLine({ line, lineIndex, lineageClue }: PoemLineProps) {
@@ -58,7 +68,7 @@ export function PoemLine({ line, lineIndex, lineageClue }: PoemLineProps) {
 type PoemRowProps = {
   sentences: string[];
   startLineIndex: number;
-  lineageByLine: Map<number, LineageClue>;
+  lineageByLine: Map<number, LineageClueWithTraditional>;
 };
 
 export function PoemRow({

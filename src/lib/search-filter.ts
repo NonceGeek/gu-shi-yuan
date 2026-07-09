@@ -18,10 +18,20 @@ export function filterSearchIndex(
 
   return {
     poems: index.poems
-      .filter((poem) => includesQuery(poem.title, trimmed))
+      .filter(
+        (poem) =>
+          includesQuery(poem.title, trimmed) ||
+          includesQuery(poem.titleTraditional, trimmed) ||
+          includesQuery(poem.author, trimmed) ||
+          includesQuery(poem.authorTraditional, trimmed),
+      )
       .slice(0, MAX_POEM_RESULTS),
     authors: index.authors
-      .filter((author) => includesQuery(author.name, trimmed))
+      .filter(
+        (author) =>
+          includesQuery(author.name, trimmed) ||
+          includesQuery(author.nameTraditional, trimmed),
+      )
       .slice(0, MAX_AUTHOR_RESULTS),
   };
 }

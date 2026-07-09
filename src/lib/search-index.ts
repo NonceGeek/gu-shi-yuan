@@ -2,6 +2,7 @@ import type {
   SearchIndex,
   SearchIndexAuthor,
 } from "@/lib/search-index-types";
+import { toTraditional } from "@/lib/script-conversion";
 import {
   getAllPoems,
   getCatalogAuthorSlug,
@@ -31,10 +32,13 @@ export function buildSearchIndex(): SearchIndex {
     .map((poem) => ({
       slug: poem.slug,
       title: poem.title,
+      titleTraditional: toTraditional(poem.title),
       author: poem.author,
+      authorTraditional: toTraditional(poem.author),
       authorSlug: poem.authorSlug,
       volume: poem.volume,
       dynasty: poem.dynasty,
+      dynastyTraditional: toTraditional(poem.dynasty),
     }))
     .sort((a, b) => a.title.localeCompare(b.title, "zh-CN"));
 
@@ -48,6 +52,7 @@ export function buildSearchIndex(): SearchIndex {
 
     authorMap.set(key, {
       name: poem.author,
+      nameTraditional: toTraditional(poem.author),
       authorSlug: catalogAuthorSlug,
       volume: poem.volume,
     });

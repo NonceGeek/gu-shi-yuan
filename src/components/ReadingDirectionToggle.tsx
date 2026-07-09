@@ -1,5 +1,6 @@
 "use client";
 
+import { useUiText } from "@/components/ScriptVariantProvider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { ReadingDirection } from "@/lib/reading-direction";
 
@@ -12,6 +13,12 @@ export function ReadingDirectionToggle({
   direction,
   onDirectionChange,
 }: ReadingDirectionToggleProps) {
+  const ariaLabel = useUiText("readingDirectionAria");
+  const horizontal = useUiText("readingHorizontal");
+  const vertical = useUiText("readingVertical");
+  const horizontalAria = useUiText("readingHorizontalAria");
+  const verticalAria = useUiText("readingVerticalAria");
+
   return (
     <ToggleGroup
       value={[direction]}
@@ -24,13 +31,13 @@ export function ReadingDirectionToggle({
       variant="outline"
       size="sm"
       spacing={0}
-      aria-label="阅读方向"
+      aria-label={ariaLabel}
     >
-      <ToggleGroupItem value="horizontal" aria-label="横排">
-        横
+      <ToggleGroupItem value="horizontal" aria-label={horizontalAria}>
+        {horizontal}
       </ToggleGroupItem>
-      <ToggleGroupItem value="vertical" aria-label="竖排">
-        竖
+      <ToggleGroupItem value="vertical" aria-label={verticalAria}>
+        {vertical}
       </ToggleGroupItem>
     </ToggleGroup>
   );
