@@ -13,7 +13,6 @@ import {
   parseVerticalLayoutOverride,
   prepareVerticalDisplayChapters,
   resolveVerticalLayout,
-  resolveVerticalHeadAlignment,
   shouldConsumeVerticalReadingWheel,
   stripVerticalPunctuation,
   verticalReadingScrollLeft,
@@ -255,52 +254,3 @@ describe("applyVerticalReadingWheelDelta", () => {
   });
 });
 
-describe("resolveVerticalHeadAlignment", () => {
-  it("syncs to centered columns when content fits the viewport", () => {
-    expect(
-      resolveVerticalHeadAlignment({
-        viewportWidth: 800,
-        columnsWidth: 320,
-        columnsOffsetLeft: 240,
-      }),
-    ).toEqual({
-      mode: "columns",
-      offsetLeft: 240,
-      width: 320,
-    });
-  });
-
-  it("falls back to gutter alignment when columns overflow", () => {
-    expect(
-      resolveVerticalHeadAlignment({
-        viewportWidth: 800,
-        columnsWidth: 801,
-        columnsOffsetLeft: 0,
-      }),
-    ).toEqual({ mode: "gutter" });
-  });
-
-  it("falls back to gutter alignment before columns are measured", () => {
-    expect(
-      resolveVerticalHeadAlignment({
-        viewportWidth: 800,
-        columnsWidth: 0,
-        columnsOffsetLeft: 0,
-      }),
-    ).toEqual({ mode: "gutter" });
-  });
-
-  it("clamps negative offsets to zero", () => {
-    expect(
-      resolveVerticalHeadAlignment({
-        viewportWidth: 800,
-        columnsWidth: 320,
-        columnsOffsetLeft: -4,
-      }),
-    ).toEqual({
-      mode: "columns",
-      offsetLeft: 0,
-      width: 320,
-    });
-  });
-});

@@ -136,13 +136,6 @@ export function alignVerticalScrollToFirstColumn(
   }
 }
 
-export type VerticalHeadAlignment =
-  | { mode: "gutter" }
-  | { mode: "columns"; offsetLeft: number; width: number };
-
-/**
- * 窄内容时让顶栏面包屑与诗列同宽同位；溢出时回退到版心左对齐。
- */
 export function hasVerticalReadingHorizontalOverflow(
   scrollWidth: number,
   clientWidth: number,
@@ -173,20 +166,3 @@ export function applyVerticalReadingWheelDelta(
   });
 }
 
-export function resolveVerticalHeadAlignment(input: {
-  viewportWidth: number;
-  columnsWidth: number;
-  columnsOffsetLeft: number;
-}): VerticalHeadAlignment {
-  const { viewportWidth, columnsWidth, columnsOffsetLeft } = input;
-
-  if (columnsWidth <= 0 || columnsWidth > viewportWidth + 0.5) {
-    return { mode: "gutter" };
-  }
-
-  return {
-    mode: "columns",
-    offsetLeft: Math.max(0, columnsOffsetLeft),
-    width: columnsWidth,
-  };
-}

@@ -23,7 +23,6 @@ import {
   hasVerticalReadingHorizontalOverflow,
   prepareVerticalDisplayChapters,
   resolveVerticalLayout,
-  resolveVerticalHeadAlignment,
   shouldConsumeVerticalReadingWheel,
   verticalReadingScrollLeft,
 } from "@/lib/vertical-layout";
@@ -97,70 +96,35 @@ export function PoemReader({
 
   const readingAreaRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
-  const layoutRef = useRef<HTMLDivElement>(null);
-  const headRef = useRef<HTMLDivElement>(null);
-  const columnsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const viewport = viewportRef.current;
-    const head = headRef.current;
-    const columns = columnsRef.current;
-    if (!viewport || !head || !columns) {
+    const scrollViewport = viewportRef.current;
+    if (!scrollViewport) {
       return;
     }
 
     let cancelled = false;
 
-    function applyHeadAlignment() {
-      const layout = layoutRef.current;
-      if (!layout || !head || !columns || !viewport) {
-        return;
-      }
-
-      const columnsRect = columns.getBoundingClientRect();
-      const layoutRect = layout.getBoundingClientRect();
-      const alignment = resolveVerticalHeadAlignment({
-        viewportWidth: viewport.clientWidth,
-        columnsWidth: columnsRect.width,
-        columnsOffsetLeft: columnsRect.left - layoutRect.left,
-      });
-
-      if (alignment.mode === "gutter") {
-        head.style.removeProperty("width");
-        head.style.removeProperty("margin-inline-start");
-        head.style.removeProperty("padding-inline-end");
-        return;
-      }
-
-      head.style.width = `${alignment.width}px`;
-      head.style.marginInlineStart = `${alignment.offsetLeft}px`;
-      head.style.paddingInlineEnd = "0";
-    }
-
-    function syncVerticalReadingLayout() {
-      if (!viewport) {
+    function alignVerticalReadingStart() {
+      if (!scrollViewport) {
         return;
       }
       const target = verticalReadingScrollLeft(
-        viewport.scrollWidth,
-        viewport.clientWidth,
+        scrollViewport.scrollWidth,
+        scrollViewport.clientWidth,
       );
-      alignVerticalScrollToFirstColumn(viewport, target);
-      applyHeadAlignment();
+      alignVerticalScrollToFirstColumn(scrollViewport, target);
     }
 
-    syncVerticalReadingLayout();
-    const frame = requestAnimationFrame(syncVerticalReadingLayout);
+    alignVerticalReadingStart();
+    const frame = requestAnimationFrame(alignVerticalReadingStart);
 
-    const observer = new ResizeObserver(() => {
-      syncVerticalReadingLayout();
-    });
-    observer.observe(viewport);
-    observer.observe(columns);
+    const observer = new ResizeObserver(alignVerticalReadingStart);
+    observer.observe(scrollViewport);
 
     void document.fonts.ready.then(() => {
       if (!cancelled) {
-        syncVerticalReadingLayout();
+        alignVerticalReadingStart();
       }
     });
 
@@ -168,9 +132,6 @@ export function PoemReader({
       cancelled = true;
       cancelAnimationFrame(frame);
       observer.disconnect();
-      head.style.removeProperty("width");
-      head.style.removeProperty("margin-inline-start");
-      head.style.removeProperty("padding-inline-end");
     };
   }, [sentenceCount, variant, verticalLayout]);
 
@@ -222,13 +183,12 @@ export function PoemReader({
       className="poem-reader poem-reader--vertical relative flex min-h-dvh flex-col"
     >
       <div ref={readingAreaRef} className="poem-reader__viewport">
-        <div ref={layoutRef} className="poem-reader__vertical-layout">
-          <div ref={headRef} className="poem-reader__vertical-head site-breadcrumbs-bar">
+        <div className="poem-reader__vertical-layout">
+          <div className="poem-reader__vertical-head site-breadcrumbs-bar">
             <Breadcrumbs items={breadcrumbs} />
           </div>
           <div ref={viewportRef} className="poem-reader__columns-viewport">
             <div
-              ref={columnsRef}
               className={cn(
                 "poem-reader__columns",
                 verticalLayout === VERTICAL_LAYOUT_LINE_PER_COLUMN
