@@ -1,6 +1,10 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
+import { parsePoemBody, type PoemBodyStructure } from "./poem-body";
+
+export type { PoemBodyStructure };
+export { parsePoemBody };
 
 export type Volume = {
   slug: string;

@@ -4,17 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import type { BreadcrumbItem } from "@/components/Breadcrumbs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PoemNav } from "@/components/PoemNav";
-import { PoemLine } from "@/components/PoemLine";
+import { PoemLine, PoemRow } from "@/components/PoemLine";
 import { ReadingDirectionProvider } from "@/components/ReadingDirectionProvider";
 import { ReadingDirectionToggle } from "@/components/ReadingDirectionToggle";
 import { SiteChromeActions } from "@/components/SiteChromeActions";
 import type { LineageByLine } from "@/lib/lineage";
+import { parsePoemBody } from "@/lib/poem-body";
 import type { Poem, PoemMeta } from "@/lib/poems";
 import {
   DEFAULT_READING_DIRECTION,
   type ReadingDirection,
   alignVerticalScrollToFirstColumn,
-  groupVerticalLineColumns,
+  chapterSentenceOffsets,
+  groupHorizontalRowsByChapter,
+  groupVerticalColumnsByChapter,
   persistReadingDirection,
   readStoredReadingDirection,
   verticalReadingScrollLeft,
@@ -36,20 +39,19 @@ export function PoemReader({
   next,
   lineageByLine,
 }: PoemReaderProps) {
-  const lines = poem.body.split("\n").filter(Boolean);
+  const { chapters } = parsePoemBody(poem.body);
+  const chapterOffsets = chapterSentenceOffsets(chapters);
+  const horizontalChapters = groupHorizontalRowsByChapter(chapters);
+  const verticalChapters = groupVerticalColumnsByChapter(chapters);
+  const sentenceCount = chapters.reduce(
+    (total, chapter) => total + chapter.length,
+    0,
+  );
+
   const viewportRef = useRef<HTMLDivElement>(null);
   const [direction, setDirection] = useState<ReadingDirection>(
     DEFAULT_READING_DIRECTION,
   );
-
-  // 竖排正文：四句一列（古籍版式）；余一句落单时均衡分列，避免末句孤列。
-  const lineColumns = groupVerticalLineColumns(lines);
-  const columnStartIndexes: number[] = [];
-  let lineOffset = 0;
-  for (const column of lineColumns) {
-    columnStartIndexes.push(lineOffset);
-    lineOffset += column.length;
-  }
 
   useEffect(() => {
     setDirection(readStoredReadingDirection(localStorage));
@@ -75,7 +77,6 @@ export function PoemReader({
         viewport.scrollWidth,
         viewport.clientWidth,
       );
-      // 跨浏览器兜底：scrollLeft 原点正负两种情况都尝试。
       alignVerticalScrollToFirstColumn(viewport, target);
     }
 
@@ -98,14 +99,13 @@ export function PoemReader({
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [direction, lines.length]);
+  }, [direction, sentenceCount]);
 
   function handleDirectionChange(value: ReadingDirection) {
     setDirection(value);
     persistReadingDirection(localStorage, value);
   }
 
-  // 横排：标题+朝代作者合一，正文逐行
   const horizontalContent = (
     <>
       <header className="poem-reader__header">
@@ -115,14 +115,34 @@ export function PoemReader({
         </p>
       </header>
       <div className="poem-reader__body">
-        {lines.map((line, index) => (
-          <PoemLine
-            key={`${index}-${line}`}
-            line={line}
-            lineIndex={index}
-            lineageClue={lineageByLine.get(index)}
-          />
-        ))}
+        {horizontalChapters.map((rows, chapterIndex) => {
+          const startLineIndex = chapterOffsets[chapterIndex] ?? 0;
+          return (
+            <div
+              key={`chapter-${chapterIndex}`}
+              className={cn(
+                "poem-reader__chapter",
+                chapterIndex > 0 && "poem-reader__chapter--follows",
+              )}
+            >
+              {rows.map((rowSentences, rowIndex) => {
+                const rowStartIndex =
+                  startLineIndex +
+                  rows
+                    .slice(0, rowIndex)
+                    .reduce((sum, row) => sum + row.length, 0);
+                return (
+                  <PoemRow
+                    key={`${chapterIndex}-${rowIndex}`}
+                    sentences={rowSentences}
+                    startLineIndex={rowStartIndex}
+                    lineageByLine={lineageByLine}
+                  />
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
     </>
   );
@@ -152,10 +172,6 @@ export function PoemReader({
                 <Breadcrumbs items={breadcrumbs} layout="horizontal" />
               </div>
               <div ref={viewportRef} className="poem-reader__columns-viewport">
-                {/*
-                  竖排正文区：仅诗题与正文成列，自右向左阅读。
-                  row-reverse 让 masthead 落最右=起读列。
-                */}
                 <div className="poem-reader__columns">
                   <header className="poem-reader__masthead">
                     <h1 className="poem-reader__title">{poem.title}</h1>
@@ -163,22 +179,39 @@ export function PoemReader({
                       {poem.dynasty} · {poem.author}
                     </p>
                   </header>
-                  {lineColumns.map((columnLines, colIndex) => {
-                    const startLineIndex = columnStartIndexes[colIndex] ?? 0;
+                  {verticalChapters.map((columns, chapterIndex) => {
+                    const startLineIndex = chapterOffsets[chapterIndex] ?? 0;
                     return (
                       <div
-                        key={`col-${colIndex}`}
-                        className="poem-reader__body-column"
+                        key={`chapter-${chapterIndex}`}
+                        className={cn(
+                          "poem-reader__chapter-columns",
+                          chapterIndex > 0 && "poem-reader__chapter-columns--follows",
+                        )}
                       >
-                        {columnLines.map((line, offset) => {
-                          const lineIndex = startLineIndex + offset;
+                        {columns.map((columnLines, colIndex) => {
+                          const columnStartIndex =
+                            startLineIndex +
+                            columns
+                              .slice(0, colIndex)
+                              .reduce((sum, column) => sum + column.length, 0);
                           return (
-                            <PoemLine
-                              key={`${lineIndex}-${line}`}
-                              line={line}
-                              lineIndex={lineIndex}
-                              lineageClue={lineageByLine.get(lineIndex)}
-                            />
+                            <div
+                              key={`col-${chapterIndex}-${colIndex}`}
+                              className="poem-reader__body-column"
+                            >
+                              {columnLines.map((line, offset) => {
+                                const lineIndex = columnStartIndex + offset;
+                                return (
+                                  <PoemLine
+                                    key={`${lineIndex}-${line}`}
+                                    line={line}
+                                    lineIndex={lineIndex}
+                                    lineageClue={lineageByLine.get(lineIndex)}
+                                  />
+                                );
+                              })}
+                            </div>
                           );
                         })}
                       </div>

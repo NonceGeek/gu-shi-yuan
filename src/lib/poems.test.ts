@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { parsePoemBody } from "./poem-body";
 import {
   getAdjacentPoemsInVolume,
   getAllPoems,
@@ -10,6 +11,33 @@ import {
   getVolumeBySlug,
   isVolumeEmpty,
 } from "./poems";
+
+describe("parsePoemBody", () => {
+  it("parses a single-chapter poem into sentences", () => {
+    const poem = getPoemBySlug("ji-rang-ge");
+    expect(poem).toBeDefined();
+
+    const { chapters } = parsePoemBody(poem!.body);
+    expect(chapters).toHaveLength(1);
+    expect(chapters[0]).toEqual([
+      "日出而作。",
+      "日入而息。",
+      "凿井而饮。",
+      "耕田而食。",
+      "帝力于我何有哉。",
+    ]);
+  });
+
+  it("parses multi-chapter poems separated by blank lines", () => {
+    const poem = getPoemBySlug("kong-zi-song");
+    expect(poem).toBeDefined();
+
+    const { chapters } = parsePoemBody(poem!.body);
+    expect(chapters).toHaveLength(2);
+    expect(chapters[0]).toHaveLength(4);
+    expect(chapters[1]).toHaveLength(4);
+  });
+});
 
 describe("getPoemBySlug", () => {
   it("returns poem metadata and body for a known slug", () => {

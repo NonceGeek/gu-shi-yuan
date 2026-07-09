@@ -163,6 +163,40 @@ body {
   text-align: center;
 }
 
+.poem-reader__chapter--follows {
+  margin-top: 2.5rem;
+}
+
+.poem-reader__sentence {
+  display: inline;
+}
+
+.poem-reader__sentence--lineage {
+  display: inline;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+.poem-reader__sentence--lineage:hover,
+.poem-reader__sentence--lineage:focus-visible {
+  outline: none;
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+}
+
+.poem-reader__sentence--lineage .poem-reader__lineage-mark {
+  position: static;
+  display: inline;
+  margin-inline-start: 0.15em;
+  font-size: 0.85em;
+  color: color-mix(in srgb, var(--color-ink) 48%, transparent);
+}
+
 .poem-reader__line {
   font-size: clamp(1.125rem, 3.4vw, 1.375rem);
   line-height: 2.2;
@@ -512,7 +546,7 @@ body {
   line-height: 1.75;
 }
 
-/* 正文列：每句一纵列，四句自右向左 */
+/* 正文列：每句一纵列，五句自右向左 */
 .poem-reader--vertical .poem-reader__body-column {
   display: flex;
   /* vertical-rl 下 row 轴为纵轴，column 才是横排并列各句 */
@@ -520,6 +554,15 @@ body {
   align-items: flex-start;
   gap: 0.65em;
   flex-shrink: 0;
+}
+
+.poem-reader__chapter-columns {
+  display: contents;
+}
+
+.poem-reader__chapter-columns--follows > .poem-reader__body-column:first-child {
+  padding-inline-start: 1.25em;
+  border-inline-start: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
 }
 
 .poem-reader--vertical .poem-reader__line {

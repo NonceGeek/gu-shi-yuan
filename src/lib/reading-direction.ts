@@ -1,7 +1,8 @@
-export const VERTICAL_LINES_PER_COLUMN = 4;
+export const VERTICAL_LINES_PER_COLUMN = 5;
+export const HORIZONTAL_SENTENCES_PER_ROW = 2;
 
 /**
- * 竖排正文分列：默认每列四句。余一句落单时（如五句古诗）改为 3+2、3+3+3
+ * 竖排正文分列：默认每列五句。余一句落单时（如六句）改为 3+3、4+4+3
  * 等均衡分法，避免末句独占一列、列间距过大而显得突兀。
  */
 export function groupVerticalLineColumns(
@@ -14,11 +15,6 @@ export function groupVerticalLineColumns(
   }
 
   if (count % columnSize === 1) {
-    // 五句短章不必硬拆两列，单列间距更匀
-    if (count === 5) {
-      return [lines];
-    }
-
     const columns: string[][] = [];
     let index = 0;
     while (index < count) {
@@ -27,7 +23,7 @@ export function groupVerticalLineColumns(
         columns.push(lines.slice(index, index + columnSize));
         break;
       }
-      if (remaining === 5) {
+      if (remaining === 6) {
         columns.push(lines.slice(index, index + 3));
         columns.push(lines.slice(index + 3, count));
         break;
@@ -44,6 +40,45 @@ export function groupVerticalLineColumns(
     columns.push(lines.slice(i, i + columnSize));
   }
   return columns;
+}
+
+/** 横排正文分行：默认每行两句；奇数句时末行单句。 */
+export function groupHorizontalRows(
+  sentences: string[],
+  rowSize = HORIZONTAL_SENTENCES_PER_ROW,
+): string[][] {
+  const rows: string[][] = [];
+  for (let i = 0; i < sentences.length; i += rowSize) {
+    rows.push(sentences.slice(i, i + rowSize));
+  }
+  return rows;
+}
+
+export function groupHorizontalRowsByChapter(
+  chapters: string[][],
+  rowSize = HORIZONTAL_SENTENCES_PER_ROW,
+): string[][][] {
+  return chapters.map((chapter) => groupHorizontalRows(chapter, rowSize));
+}
+
+export function groupVerticalColumnsByChapter(
+  chapters: string[][],
+  columnSize = VERTICAL_LINES_PER_COLUMN,
+): string[][][] {
+  return chapters.map((chapter) =>
+    groupVerticalLineColumns(chapter, columnSize),
+  );
+}
+
+/** 各章首句的全局序号（0 起，跨章连续）。 */
+export function chapterSentenceOffsets(chapters: string[][]): number[] {
+  const offsets: number[] = [];
+  let total = 0;
+  for (const chapter of chapters) {
+    offsets.push(total);
+    total += chapter.length;
+  }
+  return offsets;
 }
 
 export type ReadingDirection = "horizontal" | "vertical";
