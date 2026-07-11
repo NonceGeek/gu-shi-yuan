@@ -180,21 +180,19 @@ function buildFontFaceCss(
 ): string {
   // 不前置 local()：保证所有设备使用同一站点子集，避免本机霞鹜文楷
   // （可能为 Light/Regular/不同字重）劫持正文，导致桌面/移动字重不一致。
-  // 首片用 swap（UI/常用字尽快可见）；后续片用 optional，避免换诗后晚到
-  // 子集触发 FOUT → 竖排 scroll 二次对齐。
+  // 全片用 swap：optional 会在首屏块超时后永久停在系统 fallback，不再换回文楷。
   return slices
-    .map(({ publicPath, unicodeRange }, index) => {
-      const display = index === 0 ? "swap" : "optional";
-      return `@font-face {
+    .map(
+      ({ publicPath, unicodeRange }) => `@font-face {
   font-family: "LXGW WenKai";
   font-style: normal;
-  font-display: ${display};
+  font-display: swap;
   font-weight: 400;
   src: url(${publicPath}) format("woff2");
   unicode-range: ${unicodeRange};
 }
-`;
-    })
+`,
+    )
     .join("\n");
 }
 

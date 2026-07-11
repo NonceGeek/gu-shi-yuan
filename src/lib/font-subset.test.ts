@@ -57,14 +57,13 @@ describe("font subset", () => {
     }
   });
 
-  it("uses font-display swap for the first face and optional thereafter", () => {
+  it("declares font-display swap on every WenKai face", () => {
     const css = fs.readFileSync(path.join(ROOT, "src/fonts/wenkai.css"), "utf8");
     const displays = [...css.matchAll(/font-display:\s*(\w+)/g)].map(
       (match) => match[1],
     );
     expect(displays.length).toBe(WENKAI_SUBSET_PATHS.length);
-    expect(displays[0]).toBe("swap");
-    expect(displays.slice(1).every((value) => value === "optional")).toBe(true);
+    expect(displays.every((value) => value === "swap")).toBe(true);
   });
 
   it.skipIf(!pythonAvailable())(
