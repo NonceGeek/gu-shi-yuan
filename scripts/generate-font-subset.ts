@@ -180,19 +180,56 @@ function buildFontFaceCss(
 ): string {
   // 不前置 local()：保证所有设备使用同一站点子集，避免本机霞鹜文楷
   // （可能为 Light/Regular/不同字重）劫持正文，导致桌面/移动字重不一致。
+  // 首片用 swap（UI/常用字尽快可见）；后续片用 optional，避免换诗后晚到
+  // 子集触发 FOUT → 竖排 scroll 二次对齐。
   return slices
-    .map(
-      ({ publicPath, unicodeRange }) => `@font-face {
+    .map(({ publicPath, unicodeRange }, index) => {
+      const display = index === 0 ? "swap" : "optional";
+      return `@font-face {
   font-family: "LXGW WenKai";
   font-style: normal;
-  font-display: swap;
+  font-display: ${display};
   font-weight: 400;
   src: url(${publicPath}) format("woff2");
   unicode-range: ${unicodeRange};
 }
-`,
-    )
+`;
+    })
     .join("\n");
+}
+
+/** Rewrite @font-face CSS from an existing cache manifest (no font rebuild). */
+function writeCssFromManifest(): boolean {
+  const manifest = readCacheManifest(MANIFEST_OUT);
+  if (
+    manifest === null ||
+    typeof manifest !== "object" ||
+    Array.isArray(manifest)
+  ) {
+    return false;
+  }
+  const slices = (manifest as { slices?: unknown }).slices;
+  if (!Array.isArray(slices) || slices.length === 0) {
+    return false;
+  }
+  const faces: { publicPath: string; unicodeRange: string }[] = [];
+  for (const slice of slices) {
+    if (
+      typeof slice !== "object" ||
+      slice === null ||
+      typeof (slice as WenKaiManifestSlice).publicPath !== "string" ||
+      typeof (slice as WenKaiManifestSlice).unicodeRange !== "string"
+    ) {
+      return false;
+    }
+    faces.push({
+      publicPath: (slice as WenKaiManifestSlice).publicPath,
+      unicodeRange: (slice as WenKaiManifestSlice).unicodeRange,
+    });
+  }
+  fs.mkdirSync(path.dirname(CSS_OUT), { recursive: true });
+  fs.writeFileSync(CSS_OUT, buildFontFaceCss(faces));
+  return true;
 }
 
 function writeGeneratedPaths(publicPaths: string[]): void {
@@ -243,6 +280,9 @@ async function main(): Promise<void> {
   const inputsHash = computeWenKaiInputsHash();
   if (tryWenKaiCacheHit(inputsHash)) {
     console.log("Skipping WenKai subset generation (cache hit)");
+    if (writeCssFromManifest()) {
+      console.log(`Rewrote ${path.relative(ROOT, CSS_OUT)} from cache manifest`);
+    }
     return;
   }
 

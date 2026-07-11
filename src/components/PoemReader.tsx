@@ -194,33 +194,49 @@ export function PoemReader({
     }
 
     let cancelled = false;
+    let raf = 0;
 
     function alignVerticalReadingStart() {
-      if (!scrollViewport) {
+      if (!scrollViewport || cancelled) {
         return;
       }
       const target = verticalReadingScrollLeft(
         scrollViewport.scrollWidth,
         scrollViewport.clientWidth,
       );
+      const current = scrollViewport.scrollLeft;
+      // Skip no-op scroll writes (font settle / ResizeObserver chatter during VT).
+      if (Math.abs(current - target) < 1) {
+        return;
+      }
+      if (target > 0 && Math.abs(current + target) < 1) {
+        return;
+      }
       alignVerticalScrollToFirstColumn(scrollViewport, target);
     }
 
-    alignVerticalReadingStart();
-    const frame = requestAnimationFrame(alignVerticalReadingStart);
+    function scheduleAlign() {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        raf = requestAnimationFrame(alignVerticalReadingStart);
+      });
+    }
 
-    const observer = new ResizeObserver(alignVerticalReadingStart);
+    alignVerticalReadingStart();
+    scheduleAlign();
+
+    const observer = new ResizeObserver(scheduleAlign);
     observer.observe(scrollViewport);
 
     void document.fonts.ready.then(() => {
       if (!cancelled) {
-        alignVerticalReadingStart();
+        scheduleAlign();
       }
     });
 
     return () => {
       cancelled = true;
-      cancelAnimationFrame(frame);
+      cancelAnimationFrame(raf);
       observer.disconnect();
     };
   }, [sentenceCount, variant, verticalLayout]);
