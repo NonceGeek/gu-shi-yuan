@@ -41,16 +41,18 @@ export type LineageByLineWithTraditional = Map<number, LineageClueWithTraditiona
 
 const convertSimplifiedToTraditional = Converter({ from: "cn", to: "t" });
 
-const sortedOverrides = [...(overrides as ConversionOverride[])].sort(
-  (a, b) => b.source.length - a.source.length,
-);
+const sortedOverrides = [...(overrides as ConversionOverride[])]
+  .sort((a, b) => b.source.length - a.source.length)
+  .map((override) => ({
+    ...override,
+    convertedSource: convertSimplifiedToTraditional(override.source),
+  }));
 
 export function toTraditional(input: string): string {
   let converted = convertSimplifiedToTraditional(input);
 
   for (const override of sortedOverrides) {
-    const convertedSource = convertSimplifiedToTraditional(override.source);
-    converted = converted.split(convertedSource).join(override.traditional);
+    converted = converted.split(override.convertedSource).join(override.traditional);
   }
 
   return converted;

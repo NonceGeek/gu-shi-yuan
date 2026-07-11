@@ -79,8 +79,9 @@ describe("collectSiteFontGlyphs", () => {
   });
 
   it("includes common punctuation from FONT_GLYPH_FALLBACK", () => {
+    const glyphs = collectSiteFontGlyphs();
     for (const char of FONT_GLYPH_FALLBACK) {
-      expect(collectSiteFontGlyphs()).toContain(char.codePointAt(0));
+      expect(glyphs).toContain(char.codePointAt(0));
     }
   });
 
