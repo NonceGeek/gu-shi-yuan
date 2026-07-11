@@ -60,6 +60,8 @@ type PoemReaderProps = {
   breadcrumbs: BreadcrumbItem[];
   prev?: PoemMetaWithTraditional;
   next?: PoemMetaWithTraditional;
+  prevVolume?: PoemMetaWithTraditional;
+  nextVolume?: PoemMetaWithTraditional;
   lineageByLine: LineageByLineWithTraditional;
 };
 
@@ -68,6 +70,8 @@ export function PoemReader({
   breadcrumbs,
   prev,
   next,
+  prevVolume,
+  nextVolume,
   lineageByLine,
 }: PoemReaderProps) {
   const router = useRouter();
@@ -116,7 +120,12 @@ export function PoemReader({
       if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
         return;
       }
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+      if (
+        event.key !== "ArrowLeft" &&
+        event.key !== "ArrowRight" &&
+        event.key !== "ArrowUp" &&
+        event.key !== "ArrowDown"
+      ) {
         return;
       }
       if (isTypingTarget(event.target)) {
@@ -126,21 +135,30 @@ export function PoemReader({
         return;
       }
 
-      // 竖排自右向左：← 下一首，→ 上一首
-      if (event.key === "ArrowLeft" && next) {
+      if (event.key === "ArrowLeft" && prev) {
+        event.preventDefault();
+        router.push(`/p/${prev.slug}`);
+        return;
+      }
+      if (event.key === "ArrowRight" && next) {
         event.preventDefault();
         router.push(`/p/${next.slug}`);
         return;
       }
-      if (event.key === "ArrowRight" && prev) {
+      if (event.key === "ArrowUp" && prevVolume) {
         event.preventDefault();
-        router.push(`/p/${prev.slug}`);
+        router.push(`/p/${prevVolume.slug}`);
+        return;
+      }
+      if (event.key === "ArrowDown" && nextVolume) {
+        event.preventDefault();
+        router.push(`/p/${nextVolume.slug}`);
       }
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [next, prev, router]);
+  }, [next, nextVolume, prev, prevVolume, router]);
 
   useEffect(() => {
     const scrollViewport = viewportRef.current;

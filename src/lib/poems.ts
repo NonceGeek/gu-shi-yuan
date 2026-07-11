@@ -355,6 +355,47 @@ export function getAdjacentPoemsInVolume(slug: string): {
   };
 }
 
+/** First poem of the previous/next non-empty volume in catalog order. */
+export function getAdjacentVolumeEntryPoems(slug: string): {
+  prevVolume?: PoemMeta;
+  nextVolume?: PoemMeta;
+} {
+  const poem = getPoemBySlug(slug);
+  if (!poem) {
+    return {};
+  }
+
+  const volumes = getAllVolumes();
+  const index = volumes.findIndex((volume) => volume.slug === poem.volume);
+  if (index === -1) {
+    return {};
+  }
+
+  function firstPoemOf(volumeSlug: string): PoemMeta | undefined {
+    return getPoemsByVolume(volumeSlug)[0];
+  }
+
+  let prevVolume: PoemMeta | undefined;
+  for (let i = index - 1; i >= 0; i--) {
+    const entry = firstPoemOf(volumes[i]!.slug);
+    if (entry) {
+      prevVolume = entry;
+      break;
+    }
+  }
+
+  let nextVolume: PoemMeta | undefined;
+  for (let i = index + 1; i < volumes.length; i++) {
+    const entry = firstPoemOf(volumes[i]!.slug);
+    if (entry) {
+      nextVolume = entry;
+      break;
+    }
+  }
+
+  return { prevVolume, nextVolume };
+}
+
 export function isVolumeEmpty(volumeSlug: string): boolean {
   return getAuthorsByVolume(volumeSlug).length === 0;
 }

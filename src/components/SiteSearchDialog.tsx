@@ -109,6 +109,7 @@ export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) 
     >
       <Command
         shouldFilter={false}
+        disablePointerSelection
         className="rounded-none bg-transparent p-0 text-[var(--color-ink)]"
       >
         <CommandInput
@@ -127,7 +128,7 @@ export function SiteSearchDialog({ open, onOpenChange }: SiteSearchDialogProps) 
               aria-hidden="true"
               className="mx-3 h-px bg-[color-mix(in_srgb,var(--color-ink)_10%,transparent)]"
             />
-            <CommandList className="max-h-80 px-1.5 py-1.5">
+            <CommandList className="max-h-[min(20rem,calc(100dvh-11rem))] touch-pan-y overscroll-contain px-1.5 py-1.5">
             {!hasResults && emptyMessage ? (
               <CommandEmpty className="py-8 text-[var(--color-ink-muted)]">
                 {emptyMessage}

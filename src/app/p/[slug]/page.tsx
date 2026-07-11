@@ -4,6 +4,7 @@ import { PoemReader } from "@/components/PoemReader";
 import { getLineageForPoem } from "@/lib/lineage";
 import {
   getAdjacentPoemsInVolume,
+  getAdjacentVolumeEntryPoems,
   getAllPoems,
   getCatalogAuthorSlug,
   getPoemBySlug,
@@ -55,6 +56,7 @@ export default async function PoemPage({ params }: PageProps) {
   }
 
   const { prev, next } = getAdjacentPoemsInVolume(slug);
+  const { prevVolume, nextVolume } = getAdjacentVolumeEntryPoems(slug);
   const lineageByLine = getLineageForPoem(slug);
 
   return (
@@ -70,6 +72,8 @@ export default async function PoemPage({ params }: PageProps) {
       ]}
       prev={prev ? withTraditionalPoemMeta(prev) : undefined}
       next={next ? withTraditionalPoemMeta(next) : undefined}
+      prevVolume={prevVolume ? withTraditionalPoemMeta(prevVolume) : undefined}
+      nextVolume={nextVolume ? withTraditionalPoemMeta(nextVolume) : undefined}
       lineageByLine={withTraditionalLineage(lineageByLine)}
     />
   );

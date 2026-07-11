@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parsePoemBody } from "./poem-body";
 import {
   getAdjacentPoemsInVolume,
+  getAdjacentVolumeEntryPoems,
   getAllPoems,
   getAllVolumes,
   ANONYMOUS_AUTHOR_NAME,
@@ -404,6 +405,47 @@ describe("getAdjacentPoemsInVolume", () => {
 
   it("returns empty neighbors for an unknown slug", () => {
     expect(getAdjacentPoemsInVolume("not-a-poem")).toEqual({});
+  });
+});
+
+describe("getAdjacentVolumeEntryPoems", () => {
+  it("returns first poems of neighboring volumes", () => {
+    const { prevVolume, nextVolume } =
+      getAdjacentVolumeEntryPoems("kang-qu-yao");
+
+    expect(prevVolume).toBeUndefined();
+    expect(nextVolume?.volume).toBe("han");
+    expect(nextVolume?.slug).toBe(getPoemsByVolume("han")[0]?.slug);
+  });
+
+  it("returns both neighbors for a middle volume", () => {
+    const weiFirst = getPoemsByVolume("wei")[0];
+    expect(weiFirst).toBeDefined();
+
+    const { prevVolume, nextVolume } = getAdjacentVolumeEntryPoems(
+      weiFirst!.slug,
+    );
+
+    expect(prevVolume?.volume).toBe("han");
+    expect(prevVolume?.slug).toBe(getPoemsByVolume("han")[0]?.slug);
+    expect(nextVolume?.volume).toBe("jin");
+    expect(nextVolume?.slug).toBe(getPoemsByVolume("jin")[0]?.slug);
+  });
+
+  it("omits nextVolume at the last volume", () => {
+    const suiFirst = getPoemsByVolume("sui")[0];
+    expect(suiFirst).toBeDefined();
+
+    const { prevVolume, nextVolume } = getAdjacentVolumeEntryPoems(
+      suiFirst!.slug,
+    );
+
+    expect(prevVolume?.volume).toBe("bei-chao");
+    expect(nextVolume).toBeUndefined();
+  });
+
+  it("returns empty neighbors for an unknown slug", () => {
+    expect(getAdjacentVolumeEntryPoems("not-a-poem")).toEqual({});
   });
 });
 
