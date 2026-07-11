@@ -21,6 +21,21 @@ npm run typecheck
 npm run verify  # 提交 PR 前的本地门禁：typecheck + lint + test
 ```
 
+## 卷目录配置生成
+
+九个朝代分卷的 `scripts/*-config.mjs` 由统一引擎从 EPUB 生成。需要本机可读的源 EPUB，通过参数或环境变量 `GUSHIYUAN_EPUB` 传入；不要把 EPUB 或机器路径写进仓库。
+
+生成顺序：`han → wei → jin → song → qi → liang → chen → bei-chao → sui`（后卷会预留前卷与古逸的 slug）。
+
+先写到临时目录、语义核对通过后再覆盖已提交配置：
+
+```bash
+npm run config:generate -- "$GUSHIYUAN_EPUB" --output-dir /tmp/gushiyuan-configs
+npm run config:verify -- /tmp/gushiyuan-configs
+```
+
+`config:verify` 必须带候选目录；核对的是 slug、题名、作者、authorSlug、dynasty、mode 与顺序，注释差异可忽略。生成数据、公开 URL 与条目顺序不应在无意中改动。
+
 ## 浏览结构
 
 按《古诗源》原书分卷：**卷 → 诗人 → 诗 → 阅读页**。

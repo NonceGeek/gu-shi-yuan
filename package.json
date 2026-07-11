@@ -15,7 +15,9 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "verify": "npm run typecheck && npm run lint && npm test",
-    "verify:generated": "tsx scripts/verify-generated-artifacts.ts"
+    "verify:generated": "tsx scripts/verify-generated-artifacts.ts",
+    "config:generate": "node scripts/generate-volume-config.mjs --all",
+    "config:verify": "node scripts/verify-volume-configs.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
