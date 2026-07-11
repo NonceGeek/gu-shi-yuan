@@ -23,7 +23,7 @@ when done.
 | Plan | Title | Priority | Effort | Depends on | Status |
 |---|---|---:|---:|---|---|
 | 001 | Add one-command verification and a CI gate | P1 | S | — | DONE · [#37](https://github.com/lima1217/gushiyuan/issues/37) |
-| 002 | Verify generated runtime artifacts in CI | P1 | M | 001 | TODO · [#38](https://github.com/lima1217/gushiyuan/issues/38) |
+| 002 | Verify generated runtime artifacts in CI | P1 | M | 001 | DONE · [#38](https://github.com/lima1217/gushiyuan/issues/38) |
 | 003 | Make EPUB imports fail before corrupting content | P1 | M | 001 | TODO |
 | 004 | Make the catalog glyph audit understand sliced fonts | P1 | S | 002 | TODO |
 | 005 | Load a slug-only artifact for random navigation | P2 | S | 002 | TODO · [#39](https://github.com/lima1217/gushiyuan/issues/39) |
